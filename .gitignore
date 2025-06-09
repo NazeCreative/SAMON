@@ -31,3 +31,33 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+# Additional useful patterns
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.swp
+*~
+
+# Generated files
+bin/
+gen/
+out/
+
+# Version control
+.git/
+.gitattributes
+.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
