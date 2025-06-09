@@ -1,15 +1,19 @@
-# SAMON
-App quản lí chi tiêu 
+# SAMON - Ứng dụng Quản lý Chi tiêu
 
+Ứng dụng quản lý chi tiêu đa nền tảng được phát triển bằng Flutter.
+
+## Cấu trúc Dự án
+
+```
 project_s/
-├── android/              
-├── ios/                   
-├── web/                   
-├── macos/
-├── windows/   
-├── linux/                
+├── android/              # [PLATFORM] Mã nguồn Android
+├── ios/                  # [PLATFORM] Mã nguồn iOS
+├── web/                  # [PLATFORM] Mã nguồn Web
+├── macos/                # [PLATFORM] Mã nguồn macOS
+├── windows/              # [PLATFORM] Mã nguồn Windows
+├── linux/                # [PLATFORM] Mã nguồn Linux
 │
-├── lib/                  
+├── lib/                  # [CORE] Mã nguồn chính của ứng dụng
 │   ├── main.dart         # Điểm khởi chạy ứng dụng
 │   │
 │   ├── core/             # [CHUNG] Các thành phần cốt lõi, dùng chung toàn ứng dụng
@@ -55,3 +59,48 @@ project_s/
 ├── analysis_options.yaml # Cấu hình các quy tắc phân tích code (linter)
 ├── pubspec.yaml          # File quản lý các gói phụ thuộc (dependencies) và assets
 └── README.md             # File giới thiệu và tài liệu về dự án
+```
+
+## Yêu cầu Hệ thống
+
+- Flutter SDK (phiên bản mới nhất)
+- Dart SDK (phiên bản mới nhất)
+- Android Studio / VS Code với Flutter plugin
+- Git
+
+## Cài đặt và Chạy
+
+1. Clone repository:
+```bash
+git clone https://github.com/your-username/SAMON.git
+cd SAMON
+```
+
+2. Cài đặt dependencies:
+```bash
+flutter pub get
+```
+
+3. Chạy ứng dụng:
+```bash
+flutter run
+```
+
+## Cấu trúc và Quy ước
+
+- **Clean Architecture**: Dự án tuân theo nguyên tắc Clean Architecture
+- **BLoC Pattern**: Sử dụng BLoC để quản lý state
+- **Repository Pattern**: Tách biệt logic truy cập dữ liệu
+- **Widget Reusability**: Tối ưu việc tái sử dụng các widget
+
+## Đóng góp
+
+1. Fork dự án
+2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
+3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`)
+4. Push lên branch (`git push origin feature/AmazingFeature`)
+5. Tạo Pull Request
+
+## Giấy phép
+
+Dự án này được cấp phép theo MIT License - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
