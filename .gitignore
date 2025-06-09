@@ -61,3 +61,8 @@ out/
 # Temporary files
 *.tmp
 *.temp
+
+# Cursor IDE
+.cursor/
+
+.vscode/
