@@ -109,7 +109,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
                 minimumSize: const Size.fromHeight(50),
               ),
               child: const Text('Cập nhật'),
-            )
+            ),
             ElevatedButton(
               onPressed: _updateWallet,
               style: ElevatedButton.styleFrom(
