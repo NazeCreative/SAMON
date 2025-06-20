@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_s/screens/home_screen.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -16,11 +17,18 @@ class WelcomePage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   // Logo
-                  Image.asset(
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                      );
+                    },
+                  child: Image.asset(
                     'assets/images/Samon_logo.png',
                     width: 100,
                     height: 100,
-                  ),
+                  )),
                   const SizedBox(height: 32),
                   // Welcome text
                   const Text(
