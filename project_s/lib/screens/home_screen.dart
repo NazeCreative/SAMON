@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'add_transaction_screen.dart';
 import 'statistics_screen.dart';
 
+
 class HomeScreen extends StatelessWidget {
   final String username = "Nguyễn Văn A";
   final double tongSoDu = 1000000;
@@ -17,10 +18,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Trang chủ'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text('Trang chủ'), centerTitle: true),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -42,9 +40,12 @@ class HomeScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Kính chào!', style: TextStyle(fontSize: 16)),
-                    Text(username, style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      username,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ],
-                )
+                ),
               ],
             ),
             SizedBox(height: 16),
@@ -59,8 +60,10 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Text('Tổng số dư', style: TextStyle(fontSize: 16)),
                   SizedBox(height: 8),
-                  Text('₫${tongSoDu.toStringAsFixed(0)}',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text(
+                    '₫${tongSoDu.toStringAsFixed(0)}',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
             ),
@@ -78,8 +81,10 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Text('Tiền thu', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 8),
-                        Text('₫${tienThu.toStringAsFixed(0)}',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          '₫${tienThu.toStringAsFixed(0)}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ],
                     ),
                   ),
@@ -96,8 +101,10 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Text('Tiền chi', style: TextStyle(fontSize: 16)),
                         SizedBox(height: 8),
-                        Text('₫${tienChi.toStringAsFixed(0)}',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          '₫${tienChi.toStringAsFixed(0)}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ],
                     ),
                   ),
@@ -108,26 +115,32 @@ class HomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Giao dịch gần đây', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  'Giao dịch gần đây',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 TextButton(
                   onPressed: () {},
                   child: Row(
-                    children: [Text('Xem thêm'), Icon(Icons.arrow_forward_ios, size: 12)],
+                    children: [
+                      Text('Xem thêm'),
+                      Icon(Icons.arrow_forward_ios, size: 12),
+                    ],
                   ),
-                )
+                ),
               ],
             ),
-            ...transactions.map((tx) => Card(
-              margin: EdgeInsets.symmetric(vertical: 6),
-              child: ListTile(
-                leading: CircleAvatar(
-                  child: Icon(Icons.image),
+            ...transactions.map(
+              (tx) => Card(
+                margin: EdgeInsets.symmetric(vertical: 6),
+                child: ListTile(
+                  leading: CircleAvatar(child: Icon(Icons.image)),
+                  title: Text(tx['title']),
+                  subtitle: Text(tx['date']),
+                  trailing: Text('₫${tx['amount']}'),
                 ),
-                title: Text(tx['title']),
-                subtitle: Text(tx['date']),
-                trailing: Text('₫${tx['amount']}'),
               ),
-            )),
+            ),
             SizedBox(height: 100),
           ],
         ),
