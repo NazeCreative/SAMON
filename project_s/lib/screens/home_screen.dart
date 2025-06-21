@@ -181,7 +181,7 @@ class HomeScreen extends StatelessWidget {
                   title: Text(tx['title']),
                   subtitle: Text(tx['date']),
                   trailing: Text(
-                    '${tx['type'] == 'income' ? '+' : '-'}₫${tx['amount']}',
+                    '${tx['type'] == 'income' ? '+' : '-'}${tx['amount']}₫',
                     style: TextStyle(
                       color: tx['type'] == 'income' ? Colors.green : Colors.red,
                       fontWeight: FontWeight.bold,
