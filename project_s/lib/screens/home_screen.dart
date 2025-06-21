@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -15,10 +16,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff000000),
       appBar: AppBar(
-        title: Text('Trang chủ'),
+        backgroundColor: Color(0xff000000),
+        title: Text(
+          'Trang chủ',
+          style: TextStyle(color: Colors.white), // 👈 dòng này làm chữ trắng
+        ),
         centerTitle: true,
-        automaticallyImplyLeading: false, // ⬅️ dòng này sẽ ẩn nút back
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
@@ -40,10 +46,19 @@ class HomeScreen extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Kính chào!', style: TextStyle(fontSize: 16)),
+                    Text(
+                      'Kính chào!',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
                     Text(
                       username,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
@@ -54,16 +69,22 @@ class HomeScreen extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: Color(0xff7f3dff),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
-                  Text('Tổng số dư', style: TextStyle(fontSize: 16)),
+                  Text(
+                    'TỔNG SỐ DƯ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                    ),
+                  ),
                   SizedBox(height: 8),
                   Text(
                     '₫${tongSoDu.toStringAsFixed(0)}',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    style: TextStyle( fontSize: 24,fontWeight: FontWeight.bold, color: Colors.white,),
                   ),
                 ],
               ),
@@ -75,16 +96,22 @@ class HomeScreen extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: Color(0xff61ac17),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       children: [
-                        Text('Tiền thu', style: TextStyle(fontSize: 16)),
+                        Text(
+                          'Tiền thu',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                         SizedBox(height: 8),
                         Text(
                           '₫${tienThu.toStringAsFixed(0)}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white,),
                         ),
                       ],
                     ),
@@ -95,16 +122,22 @@ class HomeScreen extends StatelessWidget {
                   child: Container(
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.grey[200],
+                      color: Color(0xfff43c3c),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
                       children: [
-                        Text('Tiền chi', style: TextStyle(fontSize: 16)),
+                        Text(
+                          'Tiền chi',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
+                        ),
                         SizedBox(height: 8),
                         Text(
                           '₫${tienChi.toStringAsFixed(0)}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white,),
                         ),
                       ],
                     ),
@@ -118,14 +151,14 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Text(
                   'Giao dịch gần đây',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white,),
                 ),
                 TextButton(
                   onPressed: () {},
                   child: Row(
                     children: [
-                      Text('Xem thêm'),
-                      Icon(Icons.arrow_forward_ios, size: 12),
+                      Text('Xem thêm', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white,),),
+                      Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white,),
                     ],
                   ),
                 ),

@@ -1,57 +1,147 @@
 import 'package:flutter/material.dart';
 
-class AddTransactionScreen extends StatelessWidget {
-  final TextEditingController quantityController = TextEditingController();
-  final TextEditingController notesController = TextEditingController();
-  final TextEditingController dateController = TextEditingController();
+class AddTransactionScreen extends StatefulWidget {
+  const AddTransactionScreen({Key? key}) : super(key: key);
+
+  @override
+  State<AddTransactionScreen> createState() => _AddTransactionScreenState();
+}
+
+class _AddTransactionScreenState extends State<AddTransactionScreen> {
+  // Controllers cho TextField
+  final _quantityController = TextEditingController();
+  final _notesController = TextEditingController();
+  final _dateController = TextEditingController();
+
+  // State cho Dropdown
+  String? _selectedType;
+  String? _selectedWallet;
+  String? _selectedTransType;
+
+  // Các options mẫu
+  final _typeOptions = ['Lựa chọn 1', 'Lựa chọn 2', 'Lựa chọn 3'];
+  final _walletOptions = ['Lựa chọn 1', 'Lựa chọn 2', 'Lựa chọn 3'];
+  final _transTypeOptions = ['Thu', 'Chi'];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF2D2D2D),
       appBar: AppBar(
-        leading: BackButton(),
-        title: Text('Thêm giao dịch'),
+        leading: const BackButton(color: Colors.white),
+        title: const Text('Thêm giao dịch', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+        backgroundColor: const Color(0xFF2D2D2D),
+        elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ListView(
           children: [
-            _buildDropdown('Loại'),
-            SizedBox(height: 12),
-            _buildDropdown('Ví'),
-            SizedBox(height: 12),
-            _buildDropdown('Loại giao dịch'),
-            SizedBox(height: 12),
-            _buildDateField(),
-            SizedBox(height: 12),
-            TextField(
-              controller: quantityController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Số lượng',
-                border: OutlineInputBorder(),
+            // Dropdown Loại
+            _buildField(
+              child: DropdownButtonFormField<String>(
+                value: _selectedType,
+                decoration: const InputDecoration(border: InputBorder.none),
+                hint: const Text('Loại', style: TextStyle(color: Colors.grey)),
+                items: _typeOptions.map((e) {
+                  return DropdownMenuItem(value: e, child: Text(e));
+                }).toList(),
+                onChanged: (val) => setState(() => _selectedType = val),
               ),
             ),
-            SizedBox(height: 12),
-            TextField(
-              controller: notesController,
-              decoration: InputDecoration(
-                labelText: 'Ghi chú thêm',
-                border: OutlineInputBorder(),
+            const SizedBox(height: 16),
+
+            // Dropdown Ví
+            _buildField(
+              child: DropdownButtonFormField<String>(
+                value: _selectedWallet,
+                decoration: const InputDecoration(border: InputBorder.none),
+                hint: const Text('Ví', style: TextStyle(color: Colors.grey)),
+                items: _walletOptions.map((e) {
+                  return DropdownMenuItem(value: e, child: Text(e));
+                }).toList(),
+                onChanged: (val) => setState(() => _selectedWallet = val),
               ),
-              maxLines: 3,
             ),
-            Spacer(),
+            const SizedBox(height: 16),
+
+            // Dropdown Loại giao dịch
+            _buildField(
+              child: DropdownButtonFormField<String>(
+                value: _selectedTransType,
+                decoration: const InputDecoration(border: InputBorder.none),
+                hint: const Text('Loại giao dịch', style: TextStyle(color: Colors.grey)),
+                items: _transTypeOptions.map((e) {
+                  return DropdownMenuItem(value: e, child: Text(e));
+                }).toList(),
+                onChanged: (val) => setState(() => _selectedTransType = val),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Ngày
+            _buildField(
+              child: TextField(
+                controller: _dateController,
+                keyboardType: TextInputType.datetime,
+                decoration: const InputDecoration(
+                  hintText: 'dd/mm/yy',
+                  border: InputBorder.none,
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Số lượng
+            _buildField(
+              child: TextField(
+                controller: _quantityController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: '0',
+                  border: InputBorder.none,
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Ghi chú
+            _buildField(
+              child: TextField(
+                controller: _notesController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'Ghi chú thêm',
+                  border: InputBorder.none,
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Nút Thêm
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: 50,
               child: ElevatedButton(
-                onPressed: () {},
-                child: Text('Thêm'),
+                onPressed: () {
+                  // TODO: xử lý thêm giao dịch
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF80FF00),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Thêm',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                ),
               ),
             ),
           ],
@@ -60,28 +150,19 @@ class AddTransactionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdown(String label) {
-    return DropdownButtonFormField<String>(
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(),
-      ),
-      items: ['Tùy chọn 1', 'Tùy chọn 2']
-          .map((value) => DropdownMenuItem(value: value, child: Text(value)))
-          .toList(),
-      onChanged: (value) {},
+  Widget _buildField({required Widget child}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8)),
+      child: child,
     );
   }
 
-  Widget _buildDateField() {
-    return TextField(
-      controller: dateController,
-      decoration: InputDecoration(
-        labelText: 'Ngày (dd/mm/yyyy)',
-        border: OutlineInputBorder(),
-        suffixIcon: Icon(Icons.edit_calendar),
-      ),
-      keyboardType: TextInputType.datetime,
-    );
+  @override
+  void dispose() {
+    _quantityController.dispose();
+    _notesController.dispose();
+    _dateController.dispose();
+    super.dispose();
   }
 }

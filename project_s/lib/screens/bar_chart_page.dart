@@ -63,7 +63,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         centerTitle: true,
@@ -74,12 +74,24 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
           ToggleButtons(
             isSelected: List.generate(tabs.length, (index) => index == _selectedTab),
             onPressed: (index) => setState(() => _selectedTab = index),
-            children: tabs
-                .map((e) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(e),
-            ))
-                .toList(),
+            color: Colors.white, // màu chữ tab chưa chọn
+            selectedColor: Color(0xff000000), // màu chữ tab đang chọn
+            borderColor: Colors.white, // viền nút
+            selectedBorderColor: Color(0xffffffff), // viền khi selected
+            fillColor: Color(0xff978fad), // bỏ nền màu khi selected
+            borderRadius: BorderRadius.circular(8),
+            children: List.generate(tabs.length, (index) {
+              final isSelected = index == _selectedTab;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(
+                    fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
+                  ),
+                  child: Text(tabs[index]),
+                ),
+              );
+            }),
           ),
           AspectRatio(
             aspectRatio: 1.5,
@@ -100,7 +112,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                                 : value >= 1000
                                 ? '${(value ~/ 1000)}K'
                                 : '${value.toInt()}',
-                            style: const TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12, color: Colors.white),
                           ),
                         ),
                       ),
@@ -117,7 +129,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                         getTitlesWidget: (value, meta) {
                           int idx = value.toInt();
                           if (idx >= 0 && idx < labels[_selectedTab].length) {
-                            return Text(labels[_selectedTab][idx], style: const TextStyle(fontSize: 10));
+                            return Text(labels[_selectedTab][idx], style: const TextStyle(fontSize: 10, color: Colors.white));
                           } else {
                             return const Text('');
                           }
@@ -140,9 +152,9 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('GIAO DỊCH', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text('GIAO DỊCH', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purple[200]),
+                  style: ElevatedButton.styleFrom(backgroundColor: Color(0xff978fad),),
                   onPressed: () {},
                   child: const Text('> Chi tiết', style: TextStyle(color: Colors.white)),
                 ),

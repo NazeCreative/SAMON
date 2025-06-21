@@ -60,19 +60,17 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {},
-              child: Container(
-                width: double.infinity,
-                child: Center(child: Text('Login')),
-              ),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15),
+                backgroundColor: Color(0xFF7F3DFF),
+              ),
+              child: Container(
+                width: double.infinity,
+                child: Center(child: Text('Login', style: TextStyle(color: Colors.white),),),
               ),
             ),
             SizedBox(height: 10),
-            TextButton(
-              onPressed: () {},
-              child: Text('Forgot Password?'),
-            ),
+            TextButton(onPressed: () {}, child: Text('Forgot Password?')),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/signup');
@@ -85,4 +83,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

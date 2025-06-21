@@ -107,8 +107,8 @@ class _WalletScreenState extends State<WalletScreen> {
                               }
                             },
                             child: const CircleAvatar(
-                              backgroundColor: Colors.yellow,
-                              child: Icon(Icons.add, color: Colors.black),
+                              backgroundColor: Color(0xffffbf0f),
+                              child: Icon(Icons.add_circle_outline_outlined, color: Colors.black),
                             ),
                           )
                         ],

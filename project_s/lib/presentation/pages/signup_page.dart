@@ -69,12 +69,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {},
-              child: Container(
-                width: double.infinity,
-                child: Center(child: Text('Sign Up')),
-              ),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(vertical: 15),
+                backgroundColor: Color(0xFF7F3DFF),
+              ),
+              child: Container(
+                width: double.infinity,
+                child: Center(child: Text('Sign Up', style: TextStyle(color: Colors.white),), ),
               ),
             ),
             SizedBox(height: 10),
