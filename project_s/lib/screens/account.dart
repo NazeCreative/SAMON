@@ -4,8 +4,15 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff000000),
       appBar: AppBar(
-        title: Text('Tài khoản'),
+        backgroundColor: Color(0xff000000),
+        title: Text(
+          'Tài khoản',
+          style: TextStyle(color: Colors.white), // 👈 dòng này làm chữ trắng
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -19,7 +26,7 @@ class AccountScreen extends StatelessWidget {
             SizedBox(height: 10),
             Text(
               '[USERNAME]',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             Text(
               'username@gmail.com',
@@ -27,27 +34,33 @@ class AccountScreen extends StatelessWidget {
             ),
             SizedBox(height: 20),
             ListTile(
-              leading: Icon(Icons.add_a_photo),
-              title: Text('Thêm ảnh'),
-              trailing: Icon(Icons.chevron_right),
+              leading: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.grey, // Màu nền icon
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.add_a_photo, color: Colors.white, size: 20),
+              ),
+              title: Text('Thêm ảnh', style: TextStyle(color: Colors.white)),
+              trailing: Icon(Icons.chevron_right, color: Colors.white),
               onTap: () {},
             ),
             ListTile(
-              leading: Icon(Icons.logout, color: Colors.red),
+              leading: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.logout, color: Colors.white, size: 20),
+              ),
               title: Text('Đăng xuất', style: TextStyle(color: Colors.red)),
-              trailing: Icon(Icons.chevron_right),
+              trailing: Icon(Icons.chevron_right, color: Colors.white),
               onTap: () {},
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.signal_cellular_alt), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.credit_card), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
       ),
     );
   }

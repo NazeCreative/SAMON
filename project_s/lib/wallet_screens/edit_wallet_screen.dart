@@ -43,8 +43,8 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         elevation: 1,
         centerTitle: true,
       ),
@@ -67,7 +67,6 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
             const SizedBox(height: 8),
             GestureDetector(
               onTap: () {
-                // Giả lập chọn ảnh khác
                 setState(() {
                   _icon = 'assets/user_icon.png';
                 });
@@ -99,27 +98,35 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
                 ),
               ),
             ),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: _updateWallet,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: const Text('Cập nhật'),
+            const Spacer(), // Đẩy phần dưới xuống đáy
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _updateWallet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text('Cập nhật'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _updateWallet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text('Xóa'),
+                  ),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: _updateWallet,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                minimumSize: const Size.fromHeight(50),
-              ),
-              child: const Text('Xóa'),
-            )
+            const SizedBox(height: 24), // tạo khoảng cách với đáy
           ],
         ),
       ),

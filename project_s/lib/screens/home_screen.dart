@@ -8,9 +8,18 @@ class HomeScreen extends StatelessWidget {
   final double tienChi = 200000;
 
   final List<Map<String, dynamic>> transactions = [
-    {"title": "Ăn uống", "amount": 50000, "date": "18/06/2025"},
-    {"title": "Mua sắm", "amount": 150000, "date": "17/06/2025"},
-    {"title": "Lương", "amount": 500000, "date": "15/06/2025"},
+    {
+      "title": "Ăn uống",
+      "amount": 50000,
+      "date": "18/06/2025",
+      "type": "expense", // Tiền ra
+    },
+    {
+      "title": "Lương",
+      "amount": 500000,
+      "date": "15/06/2025",
+      "type": "income", // Tiền vào
+    },
   ];
 
   @override
@@ -165,13 +174,19 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             ...transactions.map(
-              (tx) => Card(
+                  (tx) => Card(
                 margin: EdgeInsets.symmetric(vertical: 6),
                 child: ListTile(
                   leading: CircleAvatar(child: Icon(Icons.image)),
                   title: Text(tx['title']),
                   subtitle: Text(tx['date']),
-                  trailing: Text('₫${tx['amount']}'),
+                  trailing: Text(
+                    '${tx['type'] == 'income' ? '+' : '-'}₫${tx['amount']}',
+                    style: TextStyle(
+                      color: tx['type'] == 'income' ? Colors.green : Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),

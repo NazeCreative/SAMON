@@ -40,10 +40,11 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
         title: const Text('Thêm Ví'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         elevation: 1,
         centerTitle: true,
       ),

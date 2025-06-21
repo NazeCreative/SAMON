@@ -36,29 +36,21 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
   ];
 
   //phông bạt giao dịch
-  List<Map<String, dynamic>> transactions = [
+  final List<Map<String, dynamic>> transactions = [
     {
-      'icon': Icons.restaurant,
-      'color': Colors.yellow,
-      'title': 'Ăn uống',
-      'amount': -28000,
-      'date': '01/06/25'
+      "title": "Ăn uống",
+      "amount": 50000,
+      "date": "18/06/2025",
+      "type": "expense", // Tiền ra
     },
     {
-      'icon': Icons.favorite,
-      'color': Colors.green,
-      'title': 'Sức khỏe',
-      'amount': -30000,
-      'date': '31/05/25'
-    },
-    {
-      'icon': Icons.trending_up,
-      'color': Colors.lightGreen,
-      'title': 'Tiền',
-      'amount': 100000,
-      'date': '30/05/25'
+      "title": "Lương",
+      "amount": 500000,
+      "date": "15/06/2025",
+      "type": "income", // Tiền vào
     },
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -161,33 +153,32 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
               ],
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: transactions.length,
-              itemBuilder: (context, index) {
-                var tx = transactions[index];
-                return Card(
-                  color: Colors.white,
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: tx['color'],
-                      child: Icon(tx['icon'], color: Colors.black),
-                    ),
-                    title: Text(tx['title']),
-                    subtitle: Text(tx['date']),
-                    trailing: Text(
-                      '${tx['amount'] > 0 ? '+' : ''}${tx['amount'].toStringAsFixed(0)}',
-                      style: TextStyle(
-                        color: tx['amount'] > 0 ? Colors.green : Colors.red,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+          ...transactions.map(
+                (tx) => Card(
+              color: Colors.white,
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: tx['type'] == 'income' ? Colors.green[100] : Colors.red[100],
+                  child: Icon(
+                    Icons.attach_money,
+                    color: tx['type'] == 'income' ? Colors.green : Colors.red,
                   ),
-                );
-              },
+                ),
+                title: Text(tx['title']),
+                subtitle: Text(tx['date']),
+                trailing: Text(
+                  '${tx['type'] == 'income' ? '+' : '-'}₫${tx['amount']}',
+                  style: TextStyle(
+                    color: tx['type'] == 'income' ? Colors.green : Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ),
+
+          SizedBox(height: 100),
         ],
       ),
     );

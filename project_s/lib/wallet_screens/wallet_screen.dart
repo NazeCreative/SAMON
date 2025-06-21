@@ -60,7 +60,7 @@ class _WalletScreenState extends State<WalletScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            const Text('Tổng số dư', style: TextStyle(color: Colors.white70)),
+            const Text('Tổng số dư', style: TextStyle(color: Colors.white70, fontSize: 20)),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
