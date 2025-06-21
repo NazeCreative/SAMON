@@ -1,4 +1,3 @@
-// lib/screens/add_transaction_screen.dart
 import 'package:flutter/material.dart';
 
 class AddTransactionScreen extends StatelessWidget {

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:project_s/presentation/widgets/bot_nav_bar.dart';
-import 'add_transaction_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String username = "Nguyễn Văn A";
