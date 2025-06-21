@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_s/screens/add_transaction_screen.dart';
 import 'package:project_s/screens/home_screen.dart';
-import 'package:project_s/screens/statistics_screen.dart';
 import 'package:project_s/wallet_screens/wallet_screen.dart';
+import 'package:project_s/screens/bar_chart_page.dart';
+import 'package:project_s/screens/account.dart';
 
 class Bottom extends StatefulWidget {
   const Bottom({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class Bottom extends StatefulWidget {
 
 class _BottomState extends State<Bottom> {
   int index_color = 0;
-  List Screen = [HomeScreen(), StatisticsScreen(), WalletScreen(), HomeScreen()];
+  List Screen = [HomeScreen(), MyBarChartPage(), WalletScreen(), AccountScreen()]; //note đổi đường dẫn ở đây
   @override
   Widget build(BuildContext context) {
     return Scaffold(

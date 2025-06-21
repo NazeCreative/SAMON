@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_s/presentation/widgets/bot_nav_bar.dart';
 import 'add_transaction_screen.dart';
-import 'statistics_screen.dart';
-
 
 class HomeScreen extends StatelessWidget {
   final String username = "Nguyễn Văn A";
@@ -146,16 +144,6 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => AddTransactionScreen()),
-          );
-        },
-        child: Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 }

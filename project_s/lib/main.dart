@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_s/screens/home_screen.dart';
+import 'presentation/widgets/bot_nav_bar.dart';
 import 'presentation/pages/welcome_page.dart';
 
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project_s/screens/home_screen.dart';
+import 'package:project_s/presentation/widgets/bot_nav_bar.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -21,7 +21,7 @@ class WelcomePage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                        MaterialPageRoute(builder: (context) => Bottom()),
                       );
                     },
                   child: Image.asset(
