@@ -14,7 +14,9 @@ class _LoginScreenState extends State<LoginScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: Padding(

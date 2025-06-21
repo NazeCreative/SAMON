@@ -1,3 +1,4 @@
+// welcome_page.dart
 import 'package:flutter/material.dart';
 import 'package:project_s/presentation/widgets/bot_nav_bar.dart';
 import 'login_page.dart';
@@ -23,58 +24,40 @@ class WelcomePage extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Bottom()),
+                        MaterialPageRoute(builder: (context) => const Bottom()),
                       );
                     },
-                  child: Image.asset(
-                    'assets/images/Samon_logo.png',
-                    width: 100,
-                    height: 100,
-                  )),
-                  const SizedBox(height: 32),
-                  // Welcome text
-                  const Text(
-                    'Chào mừng tới',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.normal),
-                  ),
-                  const SizedBox(height: 4),
-                  // SAMON title
-                  const Text(
-                    'SAMON',
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
+                    child: Image.asset(
+                      'assets/images/Samon_logo.png',
+                      width: 100,
+                      height: 100,
                     ),
                   ),
+                  const SizedBox(height: 32),
+                  const Text('Chào mừng tới', style: TextStyle(fontSize: 20)),
+                  const SizedBox(height: 4),
+                  const Text('SAMON',
+                      style: TextStyle(fontSize: 40, fontWeight: FontWeight.w900, letterSpacing: 2)),
                   const SizedBox(height: 8),
-                  // Subtitle
-                  const Text(
-                    'Quản lý chi tiêu đáng tin cậy của bạn',
-                    style: TextStyle(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
+                  const Text('Quản lý chi tiêu đáng tin cậy của bạn',
+                      style: TextStyle(fontSize: 16), textAlign: TextAlign.center),
                   const SizedBox(height: 48),
-                  // Start text
                   const Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      'Cùng bắt đầu...',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                    ),
+                    child: Text('Cùng bắt đầu...',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   ),
                   const SizedBox(height: 16),
-                  // Google button
+
+                  // Google button (chưa có chức năng)
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.g_mobiledata, color: Colors.red, size: 28),
                       label: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text(
-                          'Continue with Google',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
-                        ),
+                        child: Text('Continue with Google',
+                            style: TextStyle(fontSize: 16, color: Colors.black)),
                       ),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.black, width: 1.2),
@@ -84,21 +67,24 @@ class WelcomePage extends StatelessWidget {
                         backgroundColor: Colors.white,
                         alignment: Alignment.centerLeft,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Sau này tích hợp Google login ở đây
+                      },
                     ),
                   ),
+
                   const SizedBox(height: 16),
-                  // Email button
+
+                  // Email button → Sign Up
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.alternate_email, color: Colors.deepPurple, size: 24),
+                      icon: const Icon(Icons.alternate_email,
+                          color: Colors.deepPurple, size: 24),
                       label: const Padding(
                         padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text(
-                          'Continue with Email',
-                          style: TextStyle(fontSize: 16, color: Colors.black),
-                        ),
+                        child: Text('Continue with Email',
+                            style: TextStyle(fontSize: 16, color: Colors.black)),
                       ),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.black, width: 1.2),
@@ -108,10 +94,14 @@ class WelcomePage extends StatelessWidget {
                         backgroundColor: Colors.white,
                         alignment: Alignment.centerLeft,
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/signup');
+                      },
                     ),
                   ),
+
                   const SizedBox(height: 32),
+
                   // Login link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -119,7 +109,7 @@ class WelcomePage extends StatelessWidget {
                       const Text('Đã có tài khoản ? '),
                       GestureDetector(
                         onTap: () {
-                          // Điều hướng sang trang login nếu cần
+                          Navigator.pushNamed(context, '/login');
                         },
                         child: const Text(
                           'Login',
@@ -140,4 +130,4 @@ class WelcomePage extends StatelessWidget {
       ),
     );
   }
-} 
+}

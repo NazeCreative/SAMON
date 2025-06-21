@@ -15,7 +15,11 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Trang chủ'), centerTitle: true),
+      appBar: AppBar(
+        title: Text('Trang chủ'),
+        centerTitle: true,
+        automaticallyImplyLeading: false, // ⬅️ dòng này sẽ ẩn nút back
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
