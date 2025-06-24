@@ -19,7 +19,7 @@ project_s/
 │   ├── core/             # [CHUNG] Các thành phần cốt lõi, dùng chung toàn ứng dụng
 │   │   ├── services/     # Kết nối tới các dịch vụ bên ngoài (Firebase, API...)
 │   │   │   └── firebase_service.dart
-│   │   ├── utils/        # Các hàm tiện ích (validators, formatters...)
+│   │   ├── untils/       # Các hàm tiện ích (validators, formatters...)
 │   │   │   └── formatter.dart
 │   │   └── theme/        # Cấu hình giao diện (màu sắc, font chữ...)
 │   │       └── app_theme.dart
@@ -30,30 +30,41 @@ project_s/
 │   │   └── repositories/ # Nơi xử lý logic lấy/ghi dữ liệu từ các nguồn (API, DB)
 │   │       └── transaction_repository.dart
 │   │
-│   └── presentation/     # [FE UI & FE LOGIC] Quản lý giao diện và trạng thái
-│       ├── bloc/         # Quản lý state (Business Logic Component)
-│       │   ├── transaction/
-│       │   │   └── transaction_bloc.dart
-│       │   └── summary/
-│       │       └── summary_bloc.dart
-│       │
-│       ├── pages/        # Các màn hình hoàn chỉnh của ứng dụng
-│       │   ├── home_page.dart
-│       │   ├── add_transaction_page.dart
-│       │   └── report_page.dart
-│       │
-│       └── widgets/      # Các thành phần giao diện nhỏ, có thể tái sử dụng
-│           ├── custom_button.dart
-│           └── transaction_list_item.dart
+│   ├── presentation/     # [FE UI & FE LOGIC] Quản lý giao diện và trạng thái
+│   │   ├── bloc/         # Quản lý state (Business Logic Component)
+│   │   │   ├── transaction/
+│   │   │   │   └── transaction_bloc.dart
+│   │   │   └── summary/
+│   │   │       └── summary_bloc.dart
+│   │   ├── pages/        # Các màn hình hoàn chỉnh của ứng dụng
+│   │   │   ├── login_page.dart
+│   │   │   ├── signup_page.dart
+│   │   │   └── welcome_page.dart
+│   │   └── widgets/      # Các thành phần giao diện nhỏ, có thể tái sử dụng
+│   │       ├── bot_nav_bar.dart
+│   │       ├── custom_button.dart
+│   │       └── transaction_list_item.dart
+│   │
+│   ├── screens/          # Các màn hình chức năng
+│   │   ├── account.dart
+│   │   ├── add_transaction_screen.dart
+│   │   ├── bar_chart_page.dart
+│   │   └── home_screen.dart
+│   │
+│   └── wallet_screens/   # Các màn hình liên quan đến ví
+│       ├── add_wallet_screen.dart
+│       ├── edit_wallet_screen.dart
+│       └── wallet_screen.dart
 │
 ├── assets/               # [DESIGNER] Chứa các tài nguyên tĩnh
 │   ├── images/
-│   │   └── logo.png
+│   │   └── Samon_logo.png
 │   └── fonts/
+│       ├── Inter-regular.ttf
+│       └── Slackey-regular.ttf
 │
 ├── test/                 # [TESTER] Chứa code cho việc kiểm thử tự động
-│   ├── bloc_test/
-│   └── widget_test/
+│   └── widget_test.dart
 │
 ├── .gitignore            # Khai báo các file/thư mục mà Git sẽ bỏ qua
 ├── analysis_options.yaml # Cấu hình các quy tắc phân tích code (linter)
