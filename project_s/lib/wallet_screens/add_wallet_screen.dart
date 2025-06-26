@@ -36,6 +36,7 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Thêm Ví'),
         leading: IconButton(
@@ -56,13 +57,14 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
               controller: nameController,
               decoration: const InputDecoration(
                 labelText: 'Tên ví',
+                labelStyle: TextStyle(color: Colors.white),
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 20),
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text('Icon ví', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text('Icon ví', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
             ),
             const SizedBox(height: 8),
             GestureDetector(
@@ -98,8 +100,8 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
             ElevatedButton(
               onPressed: _saveWallet,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
+                backgroundColor: Colors.lightGreenAccent,
+                foregroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 minimumSize: const Size.fromHeight(50),
               ),

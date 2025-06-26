@@ -37,6 +37,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text('Sửa Ví'),
         leading: IconButton(
@@ -56,13 +57,17 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
               controller: nameController,
               decoration: const InputDecoration(
                 labelText: 'Tên ví',
+                labelStyle: TextStyle(color: Colors.white),
                 border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white10, width: 2.0),
+                ),
               ),
             ),
             const SizedBox(height: 20),
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text('Icon ví', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text('Icon ví', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
             ),
             const SizedBox(height: 8),
             GestureDetector(
@@ -98,21 +103,9 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
                 ),
               ),
             ),
-            const Spacer(), // Đẩy phần dưới xuống đáy
+            const Spacer(), 
             Row(
               children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: _updateWallet,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: const Text('Cập nhật'),
-                  ),
-                ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _updateWallet,
@@ -122,6 +115,18 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                     child: const Text('Xóa'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _updateWallet,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: const Text('Cập nhật'),
                   ),
                 ),
               ],
