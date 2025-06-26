@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase configuration files (only for public repos - removed for private repo)
+# **/google-services.json
+# **/GoogleService-Info.plist
+# **/firebase_options.dart
