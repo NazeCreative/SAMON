@@ -1,8 +1,6 @@
 // welcome_page.dart
 import 'package:flutter/material.dart';
 import 'package:project_s/presentation/widgets/bot_nav_bar.dart';
-import 'login_page.dart';
-import 'signup_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);

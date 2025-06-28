@@ -25,10 +25,13 @@ android {
         applicationId = "com.example.project_s"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // Thêm cấu hình để tắt reCAPTCHA
+        manifestPlaceholders["appAuthRedirectScheme"] = "com.example.project_s"
     }
 
     buildTypes {
@@ -36,6 +39,10 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+        debug {
+            // Thêm cấu hình debug
+            manifestPlaceholders["appAuthRedirectScheme"] = "com.example.project_s"
         }
     }
 }

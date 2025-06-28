@@ -39,4 +39,12 @@ class SignOutRequested extends AuthEvent {
 
   @override
   String toString() => 'SignOutRequested()';
+}
+
+// Event to check current authentication status
+class AuthStatusChecked extends AuthEvent {
+  const AuthStatusChecked();
+
+  @override
+  String toString() => 'AuthStatusChecked()';
 } 

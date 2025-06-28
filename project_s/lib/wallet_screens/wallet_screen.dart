@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../presentation/bloc/wallet/wallet_bloc.dart';
+import '../presentation/bloc/wallet/wallet_event.dart';
+import '../presentation/bloc/wallet/wallet_state.dart';
+import '../data/models/wallet_model.dart';
 import 'edit_wallet_screen.dart';
 import 'add_wallet_screen.dart';
 
@@ -11,18 +16,12 @@ class WalletScreen extends StatefulWidget {
 
 class _WalletScreenState extends State<WalletScreen> {
   bool _showBalances = false;
-  final List<Map<String, dynamic>> _wallets = [
-    {
-      'icon': 'device.png',
-      'name': 'Ví chính',
-      'balance': 200000
-    },
-    {
-      'icon': 'device.png',
-      'name': 'Ví tiết kiệm',
-      'balance': 1000000
-    },
-  ];
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<WalletBloc>().add(const WalletsFetched());
+  }
 
   void _toggleVisibility() {
     setState(() {
@@ -30,22 +29,8 @@ class _WalletScreenState extends State<WalletScreen> {
     });
   }
 
-  void _addNewWallet(Map<String, dynamic> newWallet) {
-    setState(() {
-      _wallets.add(newWallet);
-    });
-  }
-
-  void _updateWallet(int index, Map<String, dynamic> updatedWallet) {
-    setState(() {
-      _wallets[index] = updatedWallet;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    int totalBalance = _wallets.fold(0, (sum, wallet) => sum + (wallet['balance'] as int));
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -61,19 +46,38 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
             const SizedBox(height: 20),
             const Text('Tổng số dư', style: TextStyle(color: Colors.white70, fontSize: 20)),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  _showBalances ? '${totalBalance.toString()} VND' : '****** VND',
-                  style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(_showBalances ? Icons.visibility : Icons.visibility_off, color: Colors.white70),
-                  onPressed: _toggleVisibility,
-                ),
-              ],
+            BlocBuilder<WalletBloc, WalletState>(
+              builder: (context, state) {
+                if (state is WalletLoadInProgress) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is WalletLoadSuccess) {
+                  final wallets = state.wallets;
+                  final totalBalance = wallets.fold<double>(0, (sum, wallet) => sum + wallet.balance);
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _showBalances ? '${totalBalance.toStringAsFixed(0)} VND' : '****** VND',
+                        style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: Icon(_showBalances ? Icons.visibility : Icons.visibility_off, color: Colors.white70),
+                        onPressed: _toggleVisibility,
+                      ),
+                    ],
+                  );
+                } else if (state is WalletLoadFailure) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text('Lỗi: ${state.error}', style: const TextStyle(color: Colors.red)),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
             const SizedBox(height: 10),
             Expanded(
@@ -96,15 +100,9 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              final result = await Navigator.push<Map<String, dynamic>>(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const AddWalletScreen(),
-                                ),
-                              );
-                              if (result != null) {
-                                _addNewWallet(result);
-                              }
+                              // TODO: Thêm chức năng thêm ví mới qua BLoC
+                              // Hiện tại chỉ reload lại danh sách
+                              context.read<WalletBloc>().add(const WalletsFetched());
                             },
                             child: const CircleAvatar(
                               backgroundColor: Color(0xffffbf0f),
@@ -114,27 +112,38 @@ class _WalletScreenState extends State<WalletScreen> {
                         ],
                       ),
                     ),
-                    ..._wallets.asMap().entries.map((entry) {
-                      int index = entry.key;
-                      Map<String, dynamic> wallet = entry.value;
-                      return WalletItem(
-                        image: wallet['icon'],
-                        title: wallet['name'],
-                        balance: wallet['balance'],
-                        showBalance: _showBalances,
-                        onTap: () async {
-                          final result = await Navigator.push<Map<String, dynamic>>(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditWalletScreen(wallet: wallet),
-                            ),
-                          );
-                          if (result != null) {
-                            _updateWallet(index, result);
+                    Expanded(
+                      child: BlocBuilder<WalletBloc, WalletState>(
+                        builder: (context, state) {
+                          if (state is WalletLoadInProgress) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (state is WalletLoadSuccess) {
+                            final wallets = state.wallets;
+                            if (wallets.isEmpty) {
+                              return const Center(child: Text('Chưa có ví nào', style: TextStyle(color: Colors.white70)));
+                            }
+                            return ListView.builder(
+                              itemCount: wallets.length,
+                              itemBuilder: (context, index) {
+                                final wallet = wallets[index];
+                                return WalletItem(
+                                  image: wallet.icon,
+                                  title: wallet.name,
+                                  balance: wallet.balance,
+                                  showBalance: _showBalances,
+                                  onTap: () async {
+                                    // TODO: Thêm chức năng sửa ví qua BLoC
+                                  },
+                                );
+                              },
+                            );
+                          } else if (state is WalletLoadFailure) {
+                            return Center(child: Text('Lỗi: ${state.error}', style: const TextStyle(color: Colors.red)));
                           }
+                          return const SizedBox.shrink();
                         },
-                      );
-                    }),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -149,7 +158,7 @@ class _WalletScreenState extends State<WalletScreen> {
 class WalletItem extends StatelessWidget {
   final String image;
   final String title;
-  final int balance;
+  final double balance;
   final bool showBalance;
   final VoidCallback onTap;
 
@@ -175,7 +184,7 @@ class WalletItem extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              showBalance ? '$balance VND' : '****** VND',
+              showBalance ? '${balance.toStringAsFixed(0)} VND' : '****** VND',
               style: const TextStyle(color: Colors.white70),
               overflow: TextOverflow.ellipsis,
             ),

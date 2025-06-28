@@ -27,6 +27,20 @@ class AuthSuccess extends AuthState {
   String toString() => 'AuthSuccess()';
 }
 
+// State when user is already authenticated
+class AuthAuthenticated extends AuthState {
+  final String userId;
+  final String email;
+  
+  const AuthAuthenticated({
+    required this.userId,
+    required this.email,
+  });
+
+  @override
+  String toString() => 'AuthAuthenticated(userId: $userId, email: $email)';
+}
+
 // State when authentication fails
 class AuthFailure extends AuthState {
   final String error;
