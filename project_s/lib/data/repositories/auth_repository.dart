@@ -50,7 +50,7 @@ class AuthRepository {
     }
   }
 
-  Future<void> signIn({
+  Future<User?> signIn({
     required String email,
     required String password,
   }) async {
@@ -74,13 +74,15 @@ class AuthRepository {
         password: password,
       );
       
-      if (userCredential.user != null) {
-        print('AuthRepository: Sign in successful for user: ${userCredential.user!.uid}');
+      final User? user = userCredential.user;
+      if (user != null) {
+        print('AuthRepository: Sign in successful for user: \\${user.uid}');
+        return user;
       } else {
         throw Exception('Đăng nhập thất bại: Không nhận được thông tin người dùng');
       }
     } on FirebaseAuthException catch (e) {
-      print('AuthRepository: Firebase Auth Exception - ${e.code}: ${e.message}');
+      print('AuthRepository: Firebase Auth Exception - \\${e.code}: \\${e.message}');
       switch (e.code) {
         case 'user-not-found':
           throw Exception('Không tìm thấy tài khoản với email này');
@@ -95,14 +97,14 @@ class AuthRepository {
         case 'network-request-failed':
           throw Exception('Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet');
         default:
-          throw Exception('Đăng nhập thất bại: ${e.message}');
+          throw Exception('Đăng nhập thất bại: \\${e.message}');
       }
     } catch (e) {
-      print('AuthRepository: General Exception - $e');
+      print('AuthRepository: General Exception - \\${e}');
       if (e.toString().contains('network')) {
         throw Exception('Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet');
       }
-      throw Exception('Đăng nhập thất bại: $e');
+      throw Exception('Đăng nhập thất bại: \\${e}');
     }
   }
 

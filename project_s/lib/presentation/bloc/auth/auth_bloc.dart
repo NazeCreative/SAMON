@@ -22,12 +22,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(const AuthLoadInProgress());
     try {
       print('AuthBloc: Starting sign in process for email: ${event.email}');
-      await _authRepository.signIn(
+      final user = await _authRepository.signIn(
         email: event.email,
         password: event.password,
       );
       print('AuthBloc: Sign in successful, emitting AuthSuccess');
-      emit(const AuthSuccess());
+      if (user != null) {
+        emit(AuthAuthenticated(userId: user.uid, email: user.email ?? ''));
+      } else {
+        emit(const AuthSuccess());
+      }
     } catch (e) {
       print('AuthBloc: Sign in failed with error: $e');
       String errorMessage = 'Đăng nhập thất bại';
