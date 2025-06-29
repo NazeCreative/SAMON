@@ -35,7 +35,7 @@ class TransactionRepository {
 
       // Chuyển đổi các document thành TransactionModel
       final List<TransactionModel> transactions = snapshot.docs
-          .map((doc) => TransactionModel.fromSnapshot(doc))
+          .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
 
       return transactions;
@@ -63,7 +63,7 @@ class TransactionRepository {
           .get();
 
       return snapshot.docs
-          .map((doc) => TransactionModel.fromSnapshot(doc))
+          .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi lấy giao dịch theo ví: ${e.message}');
@@ -93,7 +93,7 @@ class TransactionRepository {
           .get();
 
       return snapshot.docs
-          .map((doc) => TransactionModel.fromSnapshot(doc))
+          .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi lấy giao dịch theo thời gian: ${e.message}');
@@ -121,7 +121,7 @@ class TransactionRepository {
       // Thêm vào Firestore
       await _firestore
           .collection('transactions')
-          .add(newTransaction.toMap());
+          .add(newTransaction.toFirestore());
 
       // Cập nhật số dư ví
       await _updateWalletBalance(newTransaction);
@@ -156,7 +156,7 @@ class TransactionRepository {
         throw Exception('Giao dịch không tồn tại');
       }
 
-      final TransactionModel oldTransaction = TransactionModel.fromSnapshot(oldDoc);
+      final TransactionModel oldTransaction = TransactionModel.fromFirestore(oldDoc);
 
       // Kiểm tra quyền sở hữu
       if (oldTransaction.userId != currentUser.uid) {
@@ -172,7 +172,7 @@ class TransactionRepository {
       await _firestore
           .collection('transactions')
           .doc(transaction.id)
-          .update(updatedTransaction.toMap());
+          .update(updatedTransaction.toFirestore());
 
       // Cập nhật số dư ví (hoàn tác giao dịch cũ và áp dụng giao dịch mới)
       await _revertWalletBalance(oldTransaction);
@@ -207,7 +207,7 @@ class TransactionRepository {
         throw Exception('Giao dịch không tồn tại');
       }
 
-      final TransactionModel transaction = TransactionModel.fromSnapshot(doc);
+      final TransactionModel transaction = TransactionModel.fromFirestore(doc);
 
       // Kiểm tra quyền sở hữu
       if (transaction.userId != currentUser.uid) {
@@ -252,16 +252,16 @@ class TransactionRepository {
         return null;
       }
 
-      final TransactionModel transaction = TransactionModel.fromSnapshot(doc);
+      final TransactionModel transaction = TransactionModel.fromFirestore(doc);
 
-      // Kiểm tra quyền truy cập
+      // Kiểm tra quyền sở hữu
       if (transaction.userId != currentUser.uid) {
         throw Exception('Không có quyền truy cập giao dịch này');
       }
 
       return transaction;
     } on FirebaseException catch (e) {
-      throw Exception('Lỗi khi lấy thông tin giao dịch: ${e.message}');
+      throw Exception('Lỗi khi lấy giao dịch: ${e.message}');
     } catch (e) {
       throw Exception('Lỗi không xác định: $e');
     }
@@ -270,7 +270,7 @@ class TransactionRepository {
   // Cập nhật số dư ví khi thêm giao dịch
   Future<void> _updateWalletBalance(TransactionModel transaction) async {
     try {
-      // Lấy ví hiện tại
+      // Lấy thông tin ví
       final wallet = await _walletRepository.getWalletById(transaction.walletId);
       if (wallet == null) {
         throw Exception('Ví không tồn tại');
@@ -285,16 +285,21 @@ class TransactionRepository {
       }
 
       // Cập nhật số dư ví
-      await _walletRepository.updateWalletBalance(transaction.walletId, newBalance);
+      final updatedWallet = wallet.copyWith(
+        balance: newBalance,
+        updatedAt: DateTime.now(),
+      );
+
+      await _walletRepository.updateWallet(updatedWallet);
     } catch (e) {
       throw Exception('Lỗi khi cập nhật số dư ví: $e');
     }
   }
 
-  // Hoàn tác số dư ví khi xóa/cập nhật giao dịch
+  // Hoàn tác số dư ví khi xóa hoặc cập nhật giao dịch
   Future<void> _revertWalletBalance(TransactionModel transaction) async {
     try {
-      // Lấy ví hiện tại
+      // Lấy thông tin ví
       final wallet = await _walletRepository.getWalletById(transaction.walletId);
       if (wallet == null) {
         throw Exception('Ví không tồn tại');
@@ -309,7 +314,12 @@ class TransactionRepository {
       }
 
       // Cập nhật số dư ví
-      await _walletRepository.updateWalletBalance(transaction.walletId, newBalance);
+      final updatedWallet = wallet.copyWith(
+        balance: newBalance,
+        updatedAt: DateTime.now(),
+      );
+
+      await _walletRepository.updateWallet(updatedWallet);
     } catch (e) {
       throw Exception('Lỗi khi hoàn tác số dư ví: $e');
     }

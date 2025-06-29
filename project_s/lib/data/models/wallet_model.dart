@@ -20,10 +20,10 @@ class WalletModel {
   });
 
   // Create WalletModel from Firestore document snapshot
-  factory WalletModel.fromSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  factory WalletModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
     return WalletModel(
-      id: snapshot.id,
+      id: doc.id,
       name: data['name'] ?? '',
       icon: data['icon'] ?? '',
       balance: (data['balance'] ?? 0.0).toDouble(),
@@ -34,7 +34,7 @@ class WalletModel {
   }
 
   // Convert WalletModel to Map for Firestore
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toFirestore() {
     return {
       'name': name,
       'icon': icon,

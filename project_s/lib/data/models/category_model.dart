@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CategoryModel {
   final String? id;
   final String name;
+  final String type; // 'income' hoặc 'expense'
   final String icon;
   final String color;
   final bool isDefault;
@@ -13,6 +14,7 @@ class CategoryModel {
   CategoryModel({
     this.id,
     required this.name,
+    required this.type,
     required this.icon,
     required this.color,
     this.isDefault = false,
@@ -22,11 +24,12 @@ class CategoryModel {
   });
 
   // Create CategoryModel from Firestore document snapshot
-  factory CategoryModel.fromSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  factory CategoryModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
     return CategoryModel(
-      id: snapshot.id,
+      id: doc.id,
       name: data['name'] ?? '',
+      type: data['type'] ?? 'expense', // Mặc định là expense
       icon: data['icon'] ?? '',
       color: data['color'] ?? '#000000',
       isDefault: data['isDefault'] ?? false,
@@ -37,9 +40,10 @@ class CategoryModel {
   }
 
   // Convert CategoryModel to Map for Firestore
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toFirestore() {
     return {
       'name': name,
+      'type': type,
       'icon': icon,
       'color': color,
       'isDefault': isDefault,
@@ -53,6 +57,7 @@ class CategoryModel {
   CategoryModel copyWith({
     String? id,
     String? name,
+    String? type,
     String? icon,
     String? color,
     bool? isDefault,
@@ -63,6 +68,7 @@ class CategoryModel {
     return CategoryModel(
       id: id ?? this.id,
       name: name ?? this.name,
+      type: type ?? this.type,
       icon: icon ?? this.icon,
       color: color ?? this.color,
       isDefault: isDefault ?? this.isDefault,
@@ -74,7 +80,7 @@ class CategoryModel {
 
   @override
   String toString() {
-    return 'CategoryModel(id: $id, name: $name, icon: $icon, color: $color, isDefault: $isDefault, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CategoryModel(id: $id, name: $name, type: $type, icon: $icon, color: $color, isDefault: $isDefault, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -83,6 +89,7 @@ class CategoryModel {
     return other is CategoryModel &&
         other.id == id &&
         other.name == name &&
+        other.type == type &&
         other.icon == icon &&
         other.color == color &&
         other.isDefault == isDefault &&
@@ -95,6 +102,7 @@ class CategoryModel {
   int get hashCode {
     return id.hashCode ^
         name.hashCode ^
+        type.hashCode ^
         icon.hashCode ^
         color.hashCode ^
         isDefault.hashCode ^

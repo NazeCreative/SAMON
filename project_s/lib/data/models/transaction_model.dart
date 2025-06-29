@@ -5,7 +5,7 @@ enum TransactionType { income, expense }
 class TransactionModel {
   final String? id;
   final String title;
-  final String description;
+  final String note;
   final double amount;
   final TransactionType type;
   final String categoryId;
@@ -18,7 +18,7 @@ class TransactionModel {
   TransactionModel({
     this.id,
     required this.title,
-    required this.description,
+    required this.note,
     required this.amount,
     required this.type,
     required this.categoryId,
@@ -30,12 +30,12 @@ class TransactionModel {
   });
 
   // Create TransactionModel from Firestore document snapshot
-  factory TransactionModel.fromSnapshot(DocumentSnapshot snapshot) {
-    final data = snapshot.data() as Map<String, dynamic>;
+  factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
     return TransactionModel(
-      id: snapshot.id,
+      id: doc.id,
       title: data['title'] ?? '',
-      description: data['description'] ?? '',
+      note: data['note'] ?? '',
       amount: (data['amount'] ?? 0.0).toDouble(),
       type: data['type'] == 'income' ? TransactionType.income : TransactionType.expense,
       categoryId: data['categoryId'] ?? '',
@@ -48,10 +48,10 @@ class TransactionModel {
   }
 
   // Convert TransactionModel to Map for Firestore
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toFirestore() {
     return {
       'title': title,
-      'description': description,
+      'note': note,
       'amount': amount,
       'type': type == TransactionType.income ? 'income' : 'expense',
       'categoryId': categoryId,
@@ -67,7 +67,7 @@ class TransactionModel {
   TransactionModel copyWith({
     String? id,
     String? title,
-    String? description,
+    String? note,
     double? amount,
     TransactionType? type,
     String? categoryId,
@@ -80,7 +80,7 @@ class TransactionModel {
     return TransactionModel(
       id: id ?? this.id,
       title: title ?? this.title,
-      description: description ?? this.description,
+      note: note ?? this.note,
       amount: amount ?? this.amount,
       type: type ?? this.type,
       categoryId: categoryId ?? this.categoryId,
@@ -103,7 +103,7 @@ class TransactionModel {
     return other is TransactionModel &&
         other.id == id &&
         other.title == title &&
-        other.description == description &&
+        other.note == note &&
         other.amount == amount &&
         other.type == type &&
         other.categoryId == categoryId &&
@@ -118,7 +118,7 @@ class TransactionModel {
   int get hashCode {
     return id.hashCode ^
         title.hashCode ^
-        description.hashCode ^
+        note.hashCode ^
         amount.hashCode ^
         type.hashCode ^
         categoryId.hashCode ^

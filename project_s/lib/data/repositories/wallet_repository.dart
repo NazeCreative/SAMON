@@ -30,7 +30,7 @@ class WalletRepository {
 
       // Chuyển đổi các document thành WalletModel
       final List<WalletModel> wallets = snapshot.docs
-          .map((doc) => WalletModel.fromSnapshot(doc))
+          .map((doc) => WalletModel.fromFirestore(doc))
           .toList();
 
       return wallets;
@@ -60,7 +60,7 @@ class WalletRepository {
       // Thêm vào Firestore
       await _firestore
           .collection('wallets')
-          .add(newWallet.toMap());
+          .add(newWallet.toFirestore());
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi thêm ví: ${e.message}');
     } catch (e) {
@@ -91,7 +91,7 @@ class WalletRepository {
       await _firestore
           .collection('wallets')
           .doc(wallet.id)
-          .update(updatedWallet.toMap());
+          .update(updatedWallet.toFirestore());
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
         throw Exception('Không có quyền cập nhật ví này');
@@ -168,7 +168,7 @@ class WalletRepository {
         throw Exception('Không có quyền truy cập ví này');
       }
 
-      return WalletModel.fromSnapshot(doc);
+      return WalletModel.fromFirestore(doc);
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi lấy thông tin ví: ${e.message}');
     } catch (e) {

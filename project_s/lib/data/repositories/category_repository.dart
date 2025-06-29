@@ -39,11 +39,11 @@ class CategoryRepository {
 
       // Chuyển đổi kết quả thành CategoryModel
       final List<CategoryModel> defaultCategories = defaultCategoriesSnapshot.docs
-          .map((doc) => CategoryModel.fromSnapshot(doc))
+          .map((doc) => CategoryModel.fromFirestore(doc))
           .toList();
 
       final List<CategoryModel> userCategories = userCategoriesSnapshot.docs
-          .map((doc) => CategoryModel.fromSnapshot(doc))
+          .map((doc) => CategoryModel.fromFirestore(doc))
           .toList();
 
       // Gộp 2 danh sách: danh mục mặc định trước, sau đó là danh mục của người dùng
@@ -85,11 +85,11 @@ class CategoryRepository {
           .get();
 
       final List<CategoryModel> defaultCategories = defaultCategoriesSnapshot.docs
-          .map((doc) => CategoryModel.fromSnapshot(doc))
+          .map((doc) => CategoryModel.fromFirestore(doc))
           .toList();
 
       final List<CategoryModel> userCategories = userCategoriesSnapshot.docs
-          .map((doc) => CategoryModel.fromSnapshot(doc))
+          .map((doc) => CategoryModel.fromFirestore(doc))
           .toList();
 
       return [...defaultCategories, ...userCategories];
@@ -120,7 +120,7 @@ class CategoryRepository {
       // Thêm vào Firestore
       await _firestore
           .collection('categories')
-          .add(newCategory.toMap());
+          .add(newCategory.toFirestore());
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi thêm danh mục: ${e.message}');
     } catch (e) {
@@ -170,7 +170,7 @@ class CategoryRepository {
       await _firestore
           .collection('categories')
           .doc(category.id)
-          .update(updatedCategory.toMap());
+          .update(updatedCategory.toFirestore());
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
         throw Exception('Không có quyền cập nhật danh mục này');
@@ -252,9 +252,9 @@ class CategoryRepository {
         throw Exception('Không có quyền truy cập danh mục này');
       }
 
-      return CategoryModel.fromSnapshot(doc);
+      return CategoryModel.fromFirestore(doc);
     } on FirebaseException catch (e) {
-      throw Exception('Lỗi khi lấy thông tin danh mục: ${e.message}');
+      throw Exception('Lỗi khi lấy danh mục: ${e.message}');
     } catch (e) {
       throw Exception('Lỗi không xác định: $e');
     }
