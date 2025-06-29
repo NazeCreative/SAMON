@@ -100,7 +100,6 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              // TODO: Thêm chức năng thêm ví mới qua BLoC
                               // Hiện tại chỉ reload lại danh sách
                               context.read<WalletBloc>().add(const WalletsFetched());
                             },

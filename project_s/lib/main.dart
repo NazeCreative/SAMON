@@ -21,6 +21,8 @@ import 'data/repositories/transaction_repository.dart';
 // BLoCs
 import 'presentation/bloc/auth/auth_bloc.dart';
 import 'presentation/bloc/wallet/wallet_bloc.dart';
+import 'logic/blocs/transaction/transaction_bloc.dart';
+import 'logic/blocs/category/category_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -88,6 +90,16 @@ class MyApp extends StatelessWidget {
           BlocProvider<WalletBloc>(
             create: (context) => WalletBloc(
               walletRepository: context.read<WalletRepository>(),
+            ),
+          ),
+          BlocProvider<TransactionBloc>(
+            create: (context) => TransactionBloc(
+              transactionRepository: context.read<TransactionRepository>(),
+            ),
+          ),
+          BlocProvider<CategoryBloc>(
+            create: (context) => CategoryBloc(
+              categoryRepository: context.read<CategoryRepository>(),
             ),
           ),
         ],

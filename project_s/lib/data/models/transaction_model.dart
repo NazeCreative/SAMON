@@ -32,6 +32,11 @@ class TransactionModel {
   // Create TransactionModel from Firestore document snapshot
   factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    DateTime parseTimestamp(dynamic value) {
+      if (value is Timestamp) return value.toDate();
+      if (value is DateTime) return value;
+      return DateTime.now();
+    }
     return TransactionModel(
       id: doc.id,
       title: data['title'] ?? '',
@@ -41,9 +46,9 @@ class TransactionModel {
       categoryId: data['categoryId'] ?? '',
       walletId: data['walletId'] ?? '',
       userId: data['userId'] ?? '',
-      date: (data['date'] as Timestamp).toDate(),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      date: parseTimestamp(data['date']),
+      createdAt: parseTimestamp(data['createdAt']),
+      updatedAt: parseTimestamp(data['updatedAt']),
     );
   }
 
