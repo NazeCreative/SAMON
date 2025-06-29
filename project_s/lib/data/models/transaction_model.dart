@@ -40,7 +40,7 @@ class TransactionModel {
     return TransactionModel(
       id: doc.id,
       title: data['title'] ?? '',
-      note: data['note'] ?? '',
+      note: data['notes'] ?? '',
       amount: (data['amount'] ?? 0.0).toDouble(),
       type: data['type'] == 'income' ? TransactionType.income : TransactionType.expense,
       categoryId: data['categoryId'] ?? '',
@@ -56,7 +56,7 @@ class TransactionModel {
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
-      'note': note,
+      'notes': note,
       'amount': amount,
       'type': type == TransactionType.income ? 'income' : 'expense',
       'categoryId': categoryId,

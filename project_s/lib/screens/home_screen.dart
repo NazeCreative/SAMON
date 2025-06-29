@@ -12,6 +12,8 @@ import '../data/models/category_model.dart';
 import '../core/utils/formatter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../presentation/bloc/wallet/wallet_bloc.dart';
+import '../presentation/bloc/wallet/wallet_state.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -41,19 +43,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   String getCategoryName(String categoryId) {
-    final cat = _categories.firstWhere(
-      (c) => c.id == categoryId,
-      orElse: () => CategoryModel(
-        id: '',
-        name: 'Không rõ',
-        type: 'expense',
-        icon: '',
-        color: '#888888',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-    );
-    return cat.name;
+    try {
+      final cat = _categories.firstWhere((c) => c.id == categoryId);
+      return cat.name;
+    } catch (e) {
+      return '';
+    }
   }
 
   IconData getCategoryIcon(String categoryId) {
@@ -124,171 +119,167 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               SizedBox(height: 16),
-              BlocBuilder<TransactionBloc, TransactionState>(
-                builder: (context, state) {
+              BlocBuilder<WalletBloc, WalletState>(
+                builder: (context, walletState) {
                   double totalBalance = 0;
-                  double totalIncome = 0;
-                  double totalExpense = 0;
-
-                  List<TransactionModel> transactions = [];
-                  if (state is TransactionLoaded) {
-                    transactions = state.transactions;
-                    for (var transaction in transactions) {
-                      if (transaction.type == TransactionType.income) {
-                        totalIncome += transaction.amount;
-                        totalBalance += transaction.amount;
-                      } else {
-                        totalExpense += transaction.amount;
-                        totalBalance -= transaction.amount;
-                      }
-                    }
+                  if (walletState is WalletLoadSuccess) {
+                    final wallets = walletState.wallets;
+                    totalBalance = wallets.fold<double>(0, (sum, wallet) => sum + wallet.balance);
                   }
-
-                  return Column(
-                    children: [
-                      // Tổng số dư + thu chi nhỏ
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Color(0xff22212e),
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text('Tổng số dư', style: TextStyle(color: Colors.white70)),
-                            SizedBox(height: 8),
-                            Text(
-                              Formatter.formatCurrency(totalBalance),
-                              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                            SizedBox(height: 16),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.arrow_downward, color: Colors.green, size: 18),
-                                        SizedBox(width: 4),
-                                        Text('Tiền thu', style: TextStyle(color: Colors.white70)),
-                                      ],
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      Formatter.formatCurrency(totalIncome),
-                                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.arrow_upward, color: Colors.red, size: 18),
-                                        SizedBox(width: 4),
-                                        Text('Tiền chi', style: TextStyle(color: Colors.white70)),
-                                      ],
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      Formatter.formatCurrency(totalExpense),
-                                      style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return BlocBuilder<TransactionBloc, TransactionState>(
+                    builder: (context, state) {
+                      double totalIncome = 0;
+                      double totalExpense = 0;
+                      List<TransactionModel> transactions = [];
+                      if (state is TransactionLoaded) {
+                        transactions = state.transactions;
+                        for (var transaction in transactions) {
+                          if (transaction.type == TransactionType.income) {
+                            totalIncome += transaction.amount;
+                          } else {
+                            totalExpense += transaction.amount;
+                          }
+                        }
+                      }
+                      return Column(
                         children: [
-                          Text(
-                            'Giao dịch gần đây',
-                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
-                          ),
-                          TextButton(
-                            onPressed: () {},
-                            child: Row(
+                          Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(24),
+                            decoration: BoxDecoration(
+                              color: Color(0xff22212e),
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 8,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text('Xem tất cả', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                                Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                                Text('Tổng số dư', style: TextStyle(color: Colors.white70)),
+                                SizedBox(height: 8),
+                                Text(
+                                  Formatter.formatCurrency(totalBalance),
+                                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+                                ),
+                                SizedBox(height: 16),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.arrow_downward, color: Colors.green, size: 18),
+                                            SizedBox(width: 4),
+                                            Text('Tiền thu', style: TextStyle(color: Colors.white70)),
+                                          ],
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          Formatter.formatCurrency(totalIncome),
+                                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.arrow_upward, color: Colors.red, size: 18),
+                                            SizedBox(width: 4),
+                                            Text('Tiền chi', style: TextStyle(color: Colors.white70)),
+                                          ],
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          Formatter.formatCurrency(totalExpense),
+                                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
+                          SizedBox(height: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Giao dịch gần đây',
+                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
+                              ),
+                              TextButton(
+                                onPressed: () {},
+                                child: Row(
+                                  children: [
+                                    Text('Xem tất cả', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                    Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (transactions.isEmpty)
+                            Padding(
+                              padding: EdgeInsets.all(20),
+                              child: Text('Chưa có giao dịch nào', style: TextStyle(color: Colors.white70)),
+                            )
+                          else
+                            ...transactions.take(5).map((transaction) {
+                              final isIncome = transaction.type == TransactionType.income;
+                              final icon = getCategoryIcon(transaction.categoryId);
+                              final color = getCategoryColor(transaction.categoryId);
+                              return Card(
+                                color: Color(0xff181829),
+                                margin: EdgeInsets.symmetric(vertical: 8),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                child: ListTile(
+                                  leading: CircleAvatar(
+                                    backgroundColor: color,
+                                    child: Icon(icon, color: Colors.white),
+                                  ),
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        transaction.note.isNotEmpty ? transaction.note : transaction.title,
+                                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(
+                                        (isIncome ? '+' : '-') + Formatter.formatCurrency(transaction.amount),
+                                        style: TextStyle(
+                                          color: isIncome ? Colors.green : Colors.red,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  subtitle: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          Formatter.formatDate(transaction.date),
+                                          style: TextStyle(color: Colors.white38, fontSize: 12),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                         ],
-                      ),
-                      if (transactions.isEmpty)
-                        Padding(
-                          padding: EdgeInsets.all(20),
-                          child: Text('Chưa có giao dịch nào', style: TextStyle(color: Colors.white70)),
-                        )
-                      else
-                        ...transactions.take(5).map((transaction) {
-                          final isIncome = transaction.type == TransactionType.income;
-                          final categoryName = getCategoryName(transaction.categoryId);
-                          final icon = getCategoryIcon(transaction.categoryId);
-                          final color = getCategoryColor(transaction.categoryId);
-                          return Card(
-                            color: Color(0xff181829),
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: color,
-                                child: Icon(icon, color: Colors.white),
-                              ),
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    categoryName,
-                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    (isIncome ? '+' : '-') + Formatter.formatCurrency(transaction.amount),
-                                    style: TextStyle(
-                                      color: isIncome ? Colors.green : Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              subtitle: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      transaction.note.isNotEmpty ? transaction.note : transaction.title,
-                                      style: TextStyle(color: Colors.white70),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    Formatter.formatDate(transaction.date),
-                                    style: TextStyle(color: Colors.white38, fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                    ],
+                      );
+                    },
                   );
                 },
               ),
