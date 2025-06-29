@@ -48,7 +48,9 @@ class LoginScreenState extends State<LoginScreen> {
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess) {
+          print('LoginPage: Received state: $state');
+          if (state is AuthSuccess || state is AuthAuthenticated) {
+            print('LoginPage: Navigating to home page');
             // Navigate to home page on successful login
             Navigator.pushReplacementNamed(context, '/home');
             ScaffoldMessenger.of(context).showSnackBar(
@@ -58,6 +60,7 @@ class LoginScreenState extends State<LoginScreen> {
               ),
             );
           } else if (state is AuthFailure) {
+            print('LoginPage: Showing error message: ${state.error}');
             // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(

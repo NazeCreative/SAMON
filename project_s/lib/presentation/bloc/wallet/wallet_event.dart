@@ -1,4 +1,4 @@
-abstract class WalletEvent {
+  abstract class WalletEvent {
   const WalletEvent();
 }
 

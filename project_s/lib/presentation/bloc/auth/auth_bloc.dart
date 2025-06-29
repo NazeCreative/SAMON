@@ -28,8 +28,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
       print('AuthBloc: Sign in successful, emitting AuthSuccess');
       if (user != null) {
+        print('AuthBloc: User is not null, emitting AuthAuthenticated with userId: ${user.uid}');
         emit(AuthAuthenticated(userId: user.uid, email: user.email ?? ''));
       } else {
+        print('AuthBloc: User is null, emitting AuthSuccess');
         emit(const AuthSuccess());
       }
     } catch (e) {
