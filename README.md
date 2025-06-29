@@ -7,35 +7,47 @@
 ```
 project_s/
 ├── android/              # [PLATFORM] Mã nguồn Android
-├── ios/                  # [PLATFORM] Mã nguồn iOS
 ├── web/                  # [PLATFORM] Mã nguồn Web
-├── macos/                # [PLATFORM] Mã nguồn macOS
-├── windows/              # [PLATFORM] Mã nguồn Windows
-├── linux/                # [PLATFORM] Mã nguồn Linux
+├── build/                # [BUILD] Thư mục build được tạo tự động
+├── .dart_tool/           # [TOOL] Thư mục cache của Dart
 │
 ├── lib/                  # [CORE] Mã nguồn chính của ứng dụng
 │   ├── main.dart         # Điểm khởi chạy ứng dụng
+│   ├── firebase_options.dart # Cấu hình Firebase
 │   │
 │   ├── core/             # [CHUNG] Các thành phần cốt lõi, dùng chung toàn ứng dụng
 │   │   ├── services/     # Kết nối tới các dịch vụ bên ngoài (Firebase, API...)
 │   │   │   └── firebase_service.dart
-│   │   ├── untils/       # Các hàm tiện ích (validators, formatters...)
+│   │   ├── utils/        # Các hàm tiện ích (validators, formatters...)
 │   │   │   └── formatter.dart
 │   │   └── theme/        # Cấu hình giao diện (màu sắc, font chữ...)
 │   │       └── app_theme.dart
 │   │
 │   ├── data/             # [BE & FE LOGIC] Quản lý dữ liệu và logic nghiệp vụ
-│   │   ├── models/       # Định nghĩa các đối tượng dữ liệu (Transaction, User...)
-│   │   │   └── transaction_model.dart
+│   │   ├── models/       # Định nghĩa các đối tượng dữ liệu
+│   │   │   ├── transaction_model.dart
+│   │   │   ├── category_model.dart
+│   │   │   └── wallet_model.dart
 │   │   └── repositories/ # Nơi xử lý logic lấy/ghi dữ liệu từ các nguồn (API, DB)
-│   │       └── transaction_repository.dart
+│   │       ├── auth_repository.dart
+│   │       ├── category_repository.dart
+│   │       ├── transaction_repository.dart
+│   │       └── wallet_repository.dart
 │   │
 │   ├── presentation/     # [FE UI & FE LOGIC] Quản lý giao diện và trạng thái
 │   │   ├── bloc/         # Quản lý state (Business Logic Component)
+│   │   │   ├── auth/
+│   │   │   │   ├── auth_bloc.dart
+│   │   │   │   ├── auth_event.dart
+│   │   │   │   └── auth_state.dart
 │   │   │   ├── transaction/
 │   │   │   │   └── transaction_bloc.dart
-│   │   │   └── summary/
-│   │   │       └── summary_bloc.dart
+│   │   │   ├── summary/
+│   │   │   │   └── summary_bloc.dart
+│   │   │   └── wallet/
+│   │   │       ├── wallet_bloc.dart
+│   │   │       ├── wallet_event.dart
+│   │   │       └── wallet_state.dart
 │   │   ├── pages/        # Các màn hình hoàn chỉnh của ứng dụng
 │   │   │   ├── login_page.dart
 │   │   │   ├── signup_page.dart
@@ -63,13 +75,14 @@ project_s/
 │       ├── Inter-regular.ttf
 │       └── Slackey-regular.ttf
 │
-├── test/                 # [TESTER] Chứa code cho việc kiểm thử tự động
-│   └── widget_test.dart
-│
 ├── .gitignore            # Khai báo các file/thư mục mà Git sẽ bỏ qua
 ├── analysis_options.yaml # Cấu hình các quy tắc phân tích code (linter)
+├── firestore.rules       # Quy tắc bảo mật Firestore
 ├── pubspec.yaml          # File quản lý các gói phụ thuộc (dependencies) và assets
-└── README.md             # File giới thiệu và tài liệu về dự án
+├── pubspec.lock          # File khóa phiên bản dependencies
+├── .flutter-plugins-dependencies # Cấu hình plugin Flutter
+├── .metadata             # Metadata của dự án Flutter
+└── TROUBLESHOOTING.md    # Hướng dẫn xử lý sự cố
 ```
 
 ## Yêu cầu Hệ thống
