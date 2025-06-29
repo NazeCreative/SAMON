@@ -22,16 +22,19 @@ class WalletRepository {
       }
 
       // Tạo query để lấy các ví của người dùng hiện tại
+      // Sử dụng orderBy đơn giản để tránh lỗi composite index
       final QuerySnapshot snapshot = await _firestore
           .collection('wallets')
           .where('userId', isEqualTo: currentUser.uid)
-          .orderBy('createdAt', descending: true)
           .get();
 
       // Chuyển đổi các document thành WalletModel
       final List<WalletModel> wallets = snapshot.docs
           .map((doc) => WalletModel.fromFirestore(doc))
           .toList();
+
+      // Sắp xếp theo createdAt trong Dart thay vì trong query
+      wallets.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
       return wallets;
     } on FirebaseException catch (e) {

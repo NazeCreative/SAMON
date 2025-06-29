@@ -29,14 +29,19 @@ class TransactionRepository {
       final QuerySnapshot snapshot = await _firestore
           .collection('transactions')
           .where('userId', isEqualTo: currentUser.uid)
-          .orderBy('date', descending: true)
-          .orderBy('createdAt', descending: true)
           .get();
 
       // Chuyển đổi các document thành TransactionModel
       final List<TransactionModel> transactions = snapshot.docs
           .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
+
+      // Sắp xếp theo date và createdAt trong Dart thay vì trong query
+      transactions.sort((a, b) {
+        int dateComparison = b.date.compareTo(a.date);
+        if (dateComparison != 0) return dateComparison;
+        return b.createdAt.compareTo(a.createdAt);
+      });
 
       return transactions;
     } on FirebaseException catch (e) {
@@ -58,13 +63,20 @@ class TransactionRepository {
           .collection('transactions')
           .where('userId', isEqualTo: currentUser.uid)
           .where('walletId', isEqualTo: walletId)
-          .orderBy('date', descending: true)
-          .orderBy('createdAt', descending: true)
           .get();
 
-      return snapshot.docs
+      final List<TransactionModel> transactions = snapshot.docs
           .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
+
+      // Sắp xếp theo date và createdAt trong Dart
+      transactions.sort((a, b) {
+        int dateComparison = b.date.compareTo(a.date);
+        if (dateComparison != 0) return dateComparison;
+        return b.createdAt.compareTo(a.createdAt);
+      });
+
+      return transactions;
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi lấy giao dịch theo ví: ${e.message}');
     } catch (e) {
@@ -88,13 +100,20 @@ class TransactionRepository {
           .where('userId', isEqualTo: currentUser.uid)
           .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
           .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
-          .orderBy('date', descending: true)
-          .orderBy('createdAt', descending: true)
           .get();
 
-      return snapshot.docs
+      final List<TransactionModel> transactions = snapshot.docs
           .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
+
+      // Sắp xếp theo date và createdAt trong Dart
+      transactions.sort((a, b) {
+        int dateComparison = b.date.compareTo(a.date);
+        if (dateComparison != 0) return dateComparison;
+        return b.createdAt.compareTo(a.createdAt);
+      });
+
+      return transactions;
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi lấy giao dịch theo thời gian: ${e.message}');
     } catch (e) {

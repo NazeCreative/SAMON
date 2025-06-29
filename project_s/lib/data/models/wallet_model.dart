@@ -28,8 +28,12 @@ class WalletModel {
       icon: data['icon'] ?? '',
       balance: (data['balance'] ?? 0.0).toDouble(),
       userId: data['userId'] ?? '',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: (data['createdAt'] != null)
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: (data['updatedAt'] != null)
+          ? (data['updatedAt'] as Timestamp).toDate()
+          : DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 
