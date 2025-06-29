@@ -12,12 +12,10 @@ class CategoryRepository {
   })  : _firestore = firestore,
         _firebaseAuth = firebaseAuth;
 
-  // Lấy danh sách tất cả danh mục (mặc định + của người dùng)
+  // Lấy danh sách tất cả danh mục (chỉ mặc định cho app)
   Future<List<CategoryModel>> getCategories() async {
     try {
-      final User? currentUser = _firebaseAuth.currentUser;
-
-      // 1. Lấy danh mục mặc định
+      // Lấy danh mục mặc định (isDefault = true)
       final QuerySnapshot defaultCategoriesSnapshot = await _firestore
           .collection('categories')
           .where('isDefault', isEqualTo: true)
@@ -28,27 +26,13 @@ class CategoryRepository {
           .map((doc) => CategoryModel.fromFirestore(doc))
           .toList();
 
-      List<CategoryModel> userCategories = [];
-      if (currentUser != null) {
-        // 2. Lấy danh mục của người dùng hiện tại
-        final QuerySnapshot userCategoriesSnapshot = await _firestore
-            .collection('categories')
-            .where('userId', isEqualTo: currentUser.uid)
-            .orderBy('name')
-            .get();
-
-        userCategories = userCategoriesSnapshot.docs
-            .map((doc) => CategoryModel.fromFirestore(doc))
-            .toList();
+      // Thêm log để debug
+      print('Số lượng danh mục lấy được: [${defaultCategories.length}]');
+      for (var cat in defaultCategories) {
+        print('Category: [${cat.name}] - id: [${cat.id}]');
       }
 
-      // Gộp 2 danh sách: danh mục mặc định trước, sau đó là danh mục của người dùng
-      final List<CategoryModel> allCategories = [
-        ...defaultCategories,
-        ...userCategories,
-      ];
-
-      return allCategories;
+      return defaultCategories;
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi lấy danh sách danh mục: ${e.message}');
     } catch (e) {

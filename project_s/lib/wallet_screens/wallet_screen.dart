@@ -10,6 +10,20 @@ import '../data/models/wallet_model.dart';
 import '../data/models/category_model.dart';
 import 'edit_wallet_screen.dart';
 import 'add_wallet_screen.dart';
+import '../core/utils/formatter.dart';
+
+String formatVNCurrency(num amount) {
+  // Nếu đã có Formatter.formatCurrency thì dùng luôn
+  try {
+    return Formatter.formatCurrency(amount.toDouble());
+  } catch (e) {
+    // Nếu không có Formatter, dùng cách thủ công
+    return amount.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'\B(?=(\d{3})+(?!\d))'),
+      (match) => '.',
+    );
+  }
+}
 
 class WalletScreen extends StatefulWidget {
   const WalletScreen({super.key});
@@ -65,7 +79,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _showBalances ? '${totalBalance.toStringAsFixed(0)} VND' : '****** VND',
+                        _showBalances ? formatVNCurrency(totalBalance) : '****** ₫',
                         style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(width: 8),
@@ -214,7 +228,7 @@ class WalletItem extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              showBalance ? '${wallet.balance.toStringAsFixed(0)} VND' : '****** VND',
+              showBalance ? formatVNCurrency(wallet.balance) : '****** ₫',
               style: const TextStyle(color: Colors.white70),
               overflow: TextOverflow.ellipsis,
             ),

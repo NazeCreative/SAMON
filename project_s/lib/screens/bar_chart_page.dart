@@ -4,7 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../logic/blocs/transaction/transaction_bloc.dart';
 import '../logic/blocs/transaction/transaction_event.dart';
 import '../logic/blocs/transaction/transaction_state.dart';
+import '../logic/blocs/category/category_bloc.dart';
+import '../logic/blocs/category/category_state.dart';
+import '../logic/blocs/category/category_event.dart';
 import '../data/models/transaction_model.dart';
+import '../data/models/category_model.dart';
 import '../core/utils/formatter.dart';
 
 class MyBarChartPage extends StatefulWidget {
@@ -18,10 +22,32 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
   int _selectedTab = 0; // 0: Tuần, 1: Tháng, 2: Quý, 3: Năm
   final List<String> tabs = ['Tuần', 'Tháng', 'Quý', 'Năm'];
 
+  List<CategoryModel> _categories = [];
+
   @override
   void initState() {
     super.initState();
     context.read<TransactionBloc>().add(LoadTransactions());
+    context.read<CategoryBloc>().add(LoadCategories());
+  }
+
+  String getCategoryName(String categoryId) {
+    try {
+      final cat = _categories.firstWhere((c) => c.id == categoryId);
+      return cat.name;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  IconData getCategoryIcon(String categoryId) {
+    // Có thể mở rộng để trả về icon phù hợp
+    return Icons.category;
+  }
+
+  Color getCategoryColor(String categoryId) {
+    // Có thể mở rộng để trả về màu phù hợp
+    return Colors.grey[800]!;
   }
 
   Map<String, dynamic> _calculateData(List<TransactionModel> transactions) {
@@ -170,182 +196,195 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
         centerTitle: true,
         title: const Text('Thống kê', style: TextStyle(color: Colors.white)),
       ),
-      body: BlocBuilder<TransactionBloc, TransactionState>(
-        builder: (context, state) {
-          if (state is TransactionLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.white),
-            );
-          } else if (state is TransactionLoaded) {
-            final transactions = state.transactions;
-            final data = _calculateData(transactions);
-            final incomeData = data['income'] as List<List<double>>;
-            final expenseData = data['expense'] as List<List<double>>;
-            final years = data['years'] as List<int>;
-            final hasFutureYear = data['hasFutureYear'] as bool;
-            final labels = _generateLabels(years, hasFutureYear);
+      body: BlocBuilder<CategoryBloc, CategoryState>(
+        builder: (context, catState) {
+          if (catState is CategoryLoaded) {
+            _categories = catState.categories;
+          }
+          return BlocBuilder<TransactionBloc, TransactionState>(
+            builder: (context, state) {
+              if (state is TransactionLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                );
+              } else if (state is TransactionLoaded) {
+                final transactions = state.transactions;
+                final data = _calculateData(transactions);
+                final incomeData = data['income'] as List<List<double>>;
+                final expenseData = data['expense'] as List<List<double>>;
+                final years = data['years'] as List<int>;
+                final hasFutureYear = data['hasFutureYear'] as bool;
+                final labels = _generateLabels(years, hasFutureYear);
 
-            // Debug
-            if (_selectedTab == 2) {
-              print('Labels quý: ${labels[2]}');
-              print('Income quý: ${incomeData[2]}');
-              print('Expense quý: ${expenseData[2]}');
-            }
+                // Debug
+                if (_selectedTab == 2) {
+                  print('Labels quý: ${labels[2]}');
+                  print('Income quý: ${incomeData[2]}');
+                  print('Expense quý: ${expenseData[2]}');
+                }
 
-            final recentTransactions = transactions
-              ..sort((a, b) => b.date.compareTo(a.date))
-              ..take(5).toList();
+                final recentTransactions = List<TransactionModel>.from(transactions)
+                  ..sort((a, b) => b.date.compareTo(a.date));
 
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  ToggleButtons(
-                    isSelected: List.generate(tabs.length, (index) => index == _selectedTab),
-                    onPressed: state is TransactionLoading
-                        ? null
-                        : (index) => setState(() => _selectedTab = index),
-                    color: Colors.white,
-                    selectedColor: Color(0xff000000),
-                    borderColor: Colors.white,
-                    selectedBorderColor: Color(0xffffffff),
-                    fillColor: Color(0xff978fad),
-                    borderRadius: BorderRadius.circular(8),
-                    children: List.generate(tabs.length, (index) {
-                      final isSelected = index == _selectedTab;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: DefaultTextStyle.merge(
-                          style: TextStyle(
-                            fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                          ),
-                          child: Text(tabs[index]),
-                        ),
-                      );
-                    }),
-                  ),
-                  AspectRatio(
-                    aspectRatio: 1.5,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: BarChart(
-                        BarChartData(
-                          titlesData: FlTitlesData(
-                            leftTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                reservedSize: 60,
-                                getTitlesWidget: (value, meta) => Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: Text(
-                                    value >= 1000000
-                                        ? '${(value / 1000000).toStringAsFixed(1)}TR'
-                                        : value >= 1000
-                                        ? '${(value / 1000).toStringAsFixed(1)}K'
-                                        : Formatter.formatNumber(value),
-                                    style: const TextStyle(fontSize: 12, color: Colors.white),
+                return SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ToggleButtons(
+                        isSelected: List.generate(tabs.length, (index) => index == _selectedTab),
+                        onPressed: state is TransactionLoading
+                            ? null
+                            : (index) => setState(() => _selectedTab = index),
+                        color: Colors.white,
+                        selectedColor: Color(0xff000000),
+                        borderColor: Colors.white,
+                        selectedBorderColor: Color(0xffffffff),
+                        fillColor: Color(0xff978fad),
+                        borderRadius: BorderRadius.circular(8),
+                        children: List.generate(tabs.length, (index) {
+                          final isSelected = index == _selectedTab;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: DefaultTextStyle.merge(
+                              style: TextStyle(
+                                fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
+                              ),
+                              child: Text(tabs[index]),
+                            ),
+                          );
+                        }),
+                      ),
+                      AspectRatio(
+                        aspectRatio: 1.5,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: BarChart(
+                            BarChartData(
+                              titlesData: FlTitlesData(
+                                leftTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    reservedSize: 60,
+                                    getTitlesWidget: (value, meta) => Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: Text(
+                                        value >= 1000000
+                                            ? '${(value / 1000000).toStringAsFixed(1)}TR'
+                                            : value >= 1000
+                                            ? '${(value / 1000).toStringAsFixed(1)}K'
+                                            : Formatter.formatNumber(value),
+                                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                rightTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                                topTitles: const AxisTitles(
+                                  sideTitles: SideTitles(showTitles: false),
+                                ),
+                                bottomTitles: AxisTitles(
+                                  sideTitles: SideTitles(
+                                    showTitles: true,
+                                    getTitlesWidget: (value, meta) {
+                                      int idx = value.toInt();
+                                      if (idx >= 0 && idx < labels[_selectedTab].length) {
+                                        return Text(
+                                          labels[_selectedTab][idx],
+                                          style: const TextStyle(fontSize: 10, color: Colors.white),
+                                        );
+                                      }
+                                      return const Text('');
+                                    },
                                   ),
                                 ),
                               ),
-                            ),
-                            rightTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            topTitles: const AxisTitles(
-                              sideTitles: SideTitles(showTitles: false),
-                            ),
-                            bottomTitles: AxisTitles(
-                              sideTitles: SideTitles(
-                                showTitles: true,
-                                getTitlesWidget: (value, meta) {
-                                  int idx = value.toInt();
-                                  if (idx >= 0 && idx < labels[_selectedTab].length) {
-                                    return Text(
-                                      labels[_selectedTab][idx],
-                                      style: const TextStyle(fontSize: 10, color: Colors.white),
-                                    );
-                                  }
-                                  return const Text('');
-                                },
-                              ),
+                              barGroups: List.generate(labels[_selectedTab].length, (i) {
+                                return BarChartGroupData(
+                                  x: i,
+                                  barRods: [
+                                    BarChartRodData(toY: incomeData[_selectedTab][i], color: Colors.green, width: 10),
+                                    BarChartRodData(toY: expenseData[_selectedTab][i], color: Colors.red, width: 10),
+                                  ],
+                                );
+                              }),
                             ),
                           ),
-                          barGroups: List.generate(labels[_selectedTab].length, (i) {
-                            return BarChartGroupData(
-                              x: i,
-                              barRods: [
-                                BarChartRodData(toY: incomeData[_selectedTab][i], color: Colors.green, width: 10),
-                                BarChartRodData(toY: expenseData[_selectedTab][i], color: Colors.red, width: 10),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('GIAO DỊCH', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(backgroundColor: Color(0xff978fad)),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/transaction-detail');
+                              },
+                              child: const Text('> Chi tiết', style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (recentTransactions.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            'Chưa có giao dịch nào',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                        )
+                      else
+                        ...recentTransactions.take(5).map((transaction) => Card(
+                          color: Color(0xff181829),
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: getCategoryColor(transaction.categoryId),
+                              child: Icon(getCategoryIcon(transaction.categoryId), color: Colors.white),
+                            ),
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  transaction.note.isNotEmpty ? transaction.note : transaction.title,
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  (transaction.type == TransactionType.income ? '+' : '-') +
+                                      Formatter.formatCurrency(transaction.amount),
+                                  style: TextStyle(
+                                    color: transaction.type == TransactionType.income ? Colors.green : Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ],
-                            );
-                          }),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('GIAO DỊCH', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Color(0xff978fad)),
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/transaction-detail');
-                          },
-                          child: const Text('> Chi tiết', style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (recentTransactions.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text(
-                        'Chưa có giao dịch nào',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    )
-                  else
-                    ...recentTransactions.map((transaction) => Card(
-                      color: Colors.white,
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: transaction.type == TransactionType.income
-                              ? Colors.green[100]
-                              : Colors.red[100],
-                          child: Icon(
-                            transaction.type == TransactionType.income
-                                ? Icons.arrow_upward
-                                : Icons.arrow_downward,
-                            color: transaction.type == TransactionType.income ? Colors.green : Colors.red,
+                            ),
+                            subtitle: Text(getCategoryName(transaction.categoryId), style: TextStyle(color: Colors.white70)),
+                            trailing: Text(
+                              Formatter.formatDate(transaction.date),
+                              style: TextStyle(color: Colors.white38, fontSize: 12),
+                            ),
                           ),
-                        ),
-                        title: Text(transaction.title),
-                        subtitle: Text(Formatter.formatDate(transaction.date)),
-                        trailing: Text(
-                          '${transaction.type == TransactionType.income ? '+' : '-'}₫${transaction.amount.toStringAsFixed(0)}',
-                          style: TextStyle(
-                            color: transaction.type == TransactionType.income ? Colors.green : Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    )),
-                  SizedBox(height: 100),
-                ],
-              ),
-            );
-          } else if (state is TransactionError) {
-            return Center(
-              child: Text(
-                'Lỗi: ${state.message}',
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-          return const SizedBox.shrink();
+                        )),
+                      SizedBox(height: 100),
+                    ],
+                  ),
+                );
+              } else if (state is TransactionError) {
+                return Center(
+                  child: Text(
+                    'Lỗi: ${state.message}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          );
         },
       ),
     );
