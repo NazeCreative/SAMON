@@ -25,11 +25,10 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   // Controllers cho TextField
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
-  final _notesController = TextEditingController();
 
   // State cho Dropdown
-  CategoryModel? _selectedCategory;
-  WalletModel? _selectedWallet;
+  String? _selectedCategoryId;
+  String? _selectedWalletId;
   String? _selectedTransType;
   DateTime _selectedDate = DateTime.now();
 
@@ -78,7 +77,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListView(
             children: [
-              // Tiêu đề
+              // Tiêu đề (lưu vào note)
               _buildField(
                 child: TextField(
                   controller: _titleController,
@@ -86,53 +85,52 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     hintText: 'Tiêu đề giao dịch',
                     border: InputBorder.none,
                   ),
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Dropdown Danh mục
               BlocBuilder<CategoryBloc, CategoryState>(
                 builder: (context, state) {
                   if (state is CategoryLoaded) {
                     return _buildField(
-                      child: DropdownButtonFormField<CategoryModel>(
-                        value: _selectedCategory,
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedCategoryId,
                         decoration: const InputDecoration(border: InputBorder.none),
                         hint: const Text('Danh mục', style: TextStyle(color: Colors.grey)),
                         items: state.categories.map((category) {
                           return DropdownMenuItem(
-                            value: category,
+                            value: category.id,
                             child: Text(category.name, style: const TextStyle(color: Colors.black)),
                           );
                         }).toList(),
-                        onChanged: (val) => setState(() => _selectedCategory = val),
+                        onChanged: (val) => setState(() => _selectedCategoryId = val),
                       ),
                     );
                   }
-                  return _buildField(
-                    child: const Text('Đang tải danh mục...', style: TextStyle(color: Colors.grey)),
-                  );
+                  // Không hiển thị gì khi chưa load xong danh mục
+                  return const SizedBox.shrink();
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Dropdown Ví
               BlocBuilder<WalletBloc, WalletState>(
                 builder: (context, state) {
                   if (state is WalletLoadSuccess) {
                     return _buildField(
-                      child: DropdownButtonFormField<WalletModel>(
-                        value: _selectedWallet,
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedWalletId,
                         decoration: const InputDecoration(border: InputBorder.none),
                         hint: const Text('Ví', style: TextStyle(color: Colors.grey)),
                         items: state.wallets.map((wallet) {
                           return DropdownMenuItem(
-                            value: wallet,
+                            value: wallet.id,
                             child: Text(wallet.name, style: const TextStyle(color: Colors.black)),
                           );
                         }).toList(),
-                        onChanged: (val) => setState(() => _selectedWallet = val),
+                        onChanged: (val) => setState(() => _selectedWalletId = val),
                       ),
                     );
                   }
@@ -141,7 +139,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
               // Dropdown Loại giao dịch
               _buildField(
@@ -155,65 +153,69 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   onChanged: (val) => setState(() => _selectedTransType = val),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // Ngày
+              // Ngày (cho phép nhập tay hoặc chọn lịch)
               _buildField(
-                child: InkWell(
-                  onTap: () async {
-                    final DateTime? picked = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime.now(),
-                    );
-                    if (picked != null && picked != _selectedDate) {
-                      setState(() {
-                        _selectedDate = picked;
-                      });
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
-                          style: const TextStyle(color: Colors.white),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: TextEditingController(
+                          text: '${_selectedDate.day.toString().padLeft(2, '0')}/${_selectedDate.month.toString().padLeft(2, '0')}/${_selectedDate.year}',
                         ),
-                        const Icon(Icons.calendar_today, color: Colors.grey),
-                      ],
+                        readOnly: false,
+                        decoration: const InputDecoration(
+                          hintText: 'dd/MM/yyyy',
+                          border: InputBorder.none,
+                        ),
+                        style: const TextStyle(color: Colors.black),
+                        onChanged: (val) {
+                          final parts = val.split('/');
+                          if (parts.length == 3) {
+                            final day = int.tryParse(parts[0]);
+                            final month = int.tryParse(parts[1]);
+                            final year = int.tryParse(parts[2]);
+                            if (day != null && month != null && year != null) {
+                              setState(() {
+                                _selectedDate = DateTime(year, month, day);
+                              });
+                            }
+                          }
+                        },
+                      ),
                     ),
-                  ),
+                    IconButton(
+                      icon: const Icon(Icons.calendar_today, color: Colors.grey),
+                      onPressed: () async {
+                        final DateTime? picked = await showDatePicker(
+                          context: context,
+                          initialDate: _selectedDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime.now(),
+                        );
+                        if (picked != null && picked != _selectedDate) {
+                          setState(() {
+                            _selectedDate = picked;
+                          });
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // Số tiền
+              // Số tiền giao dịch
               _buildField(
                 child: TextField(
                   controller: _amountController,
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
-                    hintText: '0',
+                    hintText: 'Số tiền giao dịch',
                     border: InputBorder.none,
                   ),
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Ghi chú
-              _buildField(
-                child: TextField(
-                  controller: _notesController,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    hintText: 'Ghi chú thêm',
-                    border: InputBorder.none,
-                  ),
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.black),
                 ),
               ),
               const SizedBox(height: 32),
@@ -266,14 +268,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
-    if (_selectedCategory == null) {
+    if (_selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui lòng chọn danh mục'), backgroundColor: Colors.red),
       );
       return;
     }
 
-    if (_selectedWallet == null) {
+    if (_selectedWalletId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui lòng chọn ví'), backgroundColor: Colors.red),
       );
@@ -305,15 +307,15 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       return;
     }
 
-    // Create transaction
+    // Create transaction: Lưu tiêu đề vào note, để title là chuỗi rỗng
     final transaction = TransactionModel(
       id: '', // Sẽ được tạo bởi Firestore
-      title: _titleController.text,
-      note: _notesController.text,
+      title: '',
+      note: _titleController.text,
       amount: amount,
       type: _selectedTransType == 'Thu' ? TransactionType.income : TransactionType.expense,
-      categoryId: _selectedCategory!.id ?? '',
-      walletId: _selectedWallet!.id ?? '',
+      categoryId: _selectedCategoryId ?? '',
+      walletId: _selectedWalletId ?? '',
       userId: user.uid,
       date: _selectedDate,
       createdAt: DateTime.now(),
@@ -336,7 +338,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
-    _notesController.dispose();
     super.dispose();
   }
 }

@@ -3,7 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../presentation/bloc/wallet/wallet_bloc.dart';
 import '../presentation/bloc/wallet/wallet_event.dart';
 import '../presentation/bloc/wallet/wallet_state.dart';
+import '../logic/blocs/category/category_bloc.dart';
+import '../logic/blocs/category/category_event.dart';
+import '../logic/blocs/category/category_state.dart';
 import '../data/models/wallet_model.dart';
+import '../data/models/category_model.dart';
 import 'edit_wallet_screen.dart';
 import 'add_wallet_screen.dart';
 
@@ -21,6 +25,7 @@ class _WalletScreenState extends State<WalletScreen> {
   void initState() {
     super.initState();
     context.read<WalletBloc>().add(const WalletsFetched());
+    context.read<CategoryBloc>().add(LoadCategories());
   }
 
   void _toggleVisibility() {
@@ -100,8 +105,25 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              // Hiện tại chỉ reload lại danh sách
-                              context.read<WalletBloc>().add(const WalletsFetched());
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const AddWalletScreen(),
+                                ),
+                              );
+                              
+                              if (result != null) {
+                                // Tạo ví mới từ dữ liệu trả về
+                                final wallet = WalletModel(
+                                  name: result['name'],
+                                  icon: result['icon'],
+                                  balance: result['balance'],
+                                  userId: '', // Sẽ được set trong repository
+                                );
+                                    
+                                // Thêm ví mới thông qua BLoC
+                                context.read<WalletBloc>().add(WalletAdded(wallet));
+                              }
                             },
                             child: const CircleAvatar(
                               backgroundColor: Color(0xffffbf0f),
@@ -126,12 +148,25 @@ class _WalletScreenState extends State<WalletScreen> {
                               itemBuilder: (context, index) {
                                 final wallet = wallets[index];
                                 return WalletItem(
-                                  image: wallet.icon,
-                                  title: wallet.name,
-                                  balance: wallet.balance,
+                                  wallet: wallet,
                                   showBalance: _showBalances,
                                   onTap: () async {
-                                    // TODO: Thêm chức năng sửa ví qua BLoC
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditWalletScreen(wallet: wallet),
+                                      ),
+                                    );
+                                    
+                                    if (result != null) {
+                                      if (result is WalletModel) {
+                                        // Cập nhật ví
+                                        context.read<WalletBloc>().add(WalletUpdated(result));
+                                      } else if (result is Map<String, dynamic> && result['action'] == 'delete') {
+                                        // Xóa ví
+                                        context.read<WalletBloc>().add(WalletDeleted(result['walletId']));
+                                      }
+                                    }
                                   },
                                 );
                               },
@@ -155,17 +190,13 @@ class _WalletScreenState extends State<WalletScreen> {
 }
 
 class WalletItem extends StatelessWidget {
-  final String image;
-  final String title;
-  final double balance;
+  final WalletModel wallet;
   final bool showBalance;
   final VoidCallback onTap;
 
   const WalletItem({
     super.key,
-    required this.image,
-    required this.title,
-    required this.balance,
+    required this.wallet,
     required this.showBalance,
     required this.onTap,
   });
@@ -176,14 +207,14 @@ class WalletItem extends StatelessWidget {
       onTap: onTap,
       leading: ClipRRect(
         borderRadius: BorderRadius.circular(10),
-        child: Image.asset(image, width: 20, height: 20, fit: BoxFit.cover),
+        child: Image.asset(wallet.icon, width: 20, height: 20, fit: BoxFit.cover),
       ),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      title: Text(wallet.name, style: const TextStyle(color: Colors.white)),
       subtitle: Row(
         children: [
           Expanded(
             child: Text(
-              showBalance ? '${balance.toStringAsFixed(0)} VND' : '****** VND',
+              showBalance ? '${wallet.balance.toStringAsFixed(0)} VND' : '****** VND',
               style: const TextStyle(color: Colors.white70),
               overflow: TextOverflow.ellipsis,
             ),

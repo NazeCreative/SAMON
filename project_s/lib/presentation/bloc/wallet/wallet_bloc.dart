@@ -11,6 +11,9 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       : _walletRepository = walletRepository,
         super(const WalletInitial()) {
     on<WalletsFetched>(_onWalletsFetched);
+    on<WalletAdded>(_onWalletAdded);
+    on<WalletUpdated>(_onWalletUpdated);
+    on<WalletDeleted>(_onWalletDeleted);
   }
 
   Future<void> _onWalletsFetched(
@@ -19,6 +22,48 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   ) async {
     emit(const WalletLoadInProgress());
     try {
+      final wallets = await _walletRepository.getWallets();
+      emit(WalletLoadSuccess(wallets));
+    } catch (e) {
+      emit(WalletLoadFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onWalletAdded(
+    WalletAdded event,
+    Emitter<WalletState> emit,
+  ) async {
+    emit(const WalletLoadInProgress());
+    try {
+      await _walletRepository.addWallet(event.wallet);
+      final wallets = await _walletRepository.getWallets();
+      emit(WalletLoadSuccess(wallets));
+    } catch (e) {
+      emit(WalletLoadFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onWalletUpdated(
+    WalletUpdated event,
+    Emitter<WalletState> emit,
+  ) async {
+    emit(const WalletLoadInProgress());
+    try {
+      await _walletRepository.updateWallet(event.wallet);
+      final wallets = await _walletRepository.getWallets();
+      emit(WalletLoadSuccess(wallets));
+    } catch (e) {
+      emit(WalletLoadFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onWalletDeleted(
+    WalletDeleted event,
+    Emitter<WalletState> emit,
+  ) async {
+    emit(const WalletLoadInProgress());
+    try {
+      await _walletRepository.deleteWallet(event.walletId);
       final wallets = await _walletRepository.getWallets();
       emit(WalletLoadSuccess(wallets));
     } catch (e) {

@@ -6,8 +6,6 @@ class WalletModel {
   final String icon;
   final double balance;
   final String userId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
 
   WalletModel({
     this.id,
@@ -15,8 +13,6 @@ class WalletModel {
     required this.icon,
     this.balance = 0.0,
     required this.userId,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   // Create WalletModel from Firestore document snapshot
@@ -28,12 +24,6 @@ class WalletModel {
       icon: data['icon'] ?? '',
       balance: (data['balance'] ?? 0.0).toDouble(),
       userId: data['userId'] ?? '',
-      createdAt: (data['createdAt'] != null)
-          ? (data['createdAt'] as Timestamp).toDate()
-          : DateTime.fromMillisecondsSinceEpoch(0),
-      updatedAt: (data['updatedAt'] != null)
-          ? (data['updatedAt'] as Timestamp).toDate()
-          : DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 
@@ -44,8 +34,6 @@ class WalletModel {
       'icon': icon,
       'balance': balance,
       'userId': userId,
-      'createdAt': Timestamp.fromDate(createdAt),
-      'updatedAt': Timestamp.fromDate(updatedAt),
     };
   }
 
@@ -56,8 +44,6 @@ class WalletModel {
     String? icon,
     double? balance,
     String? userId,
-    DateTime? createdAt,
-    DateTime? updatedAt,
   }) {
     return WalletModel(
       id: id ?? this.id,
@@ -65,14 +51,12 @@ class WalletModel {
       icon: icon ?? this.icon,
       balance: balance ?? this.balance,
       userId: userId ?? this.userId,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
   @override
   String toString() {
-    return 'WalletModel(id: $id, name: $name, icon: $icon, balance: $balance, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'WalletModel(id: $id, name: $name, icon: $icon, balance: $balance, userId: $userId)';
   }
 
   @override
@@ -83,9 +67,7 @@ class WalletModel {
         other.name == name &&
         other.icon == icon &&
         other.balance == balance &&
-        other.userId == userId &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.userId == userId;
   }
 
   @override
@@ -94,8 +76,6 @@ class WalletModel {
         name.hashCode ^
         icon.hashCode ^
         balance.hashCode ^
-        userId.hashCode ^
-        createdAt.hashCode ^
-        updatedAt.hashCode;
+        userId.hashCode;
   }
 } 

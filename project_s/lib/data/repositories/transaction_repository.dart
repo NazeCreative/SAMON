@@ -134,7 +134,6 @@ class TransactionRepository {
       final TransactionModel newTransaction = transaction.copyWith(
         userId: currentUser.uid,
         createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
 
       // Thêm vào Firestore
@@ -184,7 +183,7 @@ class TransactionRepository {
 
       // Cập nhật giao dịch với thời gian mới
       final TransactionModel updatedTransaction = transaction.copyWith(
-        updatedAt: DateTime.now(),
+        createdAt: DateTime.now(),
       );
 
       // Cập nhật trong Firestore
@@ -306,7 +305,6 @@ class TransactionRepository {
       // Cập nhật số dư ví
       final updatedWallet = wallet.copyWith(
         balance: newBalance,
-        updatedAt: DateTime.now(),
       );
 
       await _walletRepository.updateWallet(updatedWallet);
@@ -335,7 +333,6 @@ class TransactionRepository {
       // Cập nhật số dư ví
       final updatedWallet = wallet.copyWith(
         balance: newBalance,
-        updatedAt: DateTime.now(),
       );
 
       await _walletRepository.updateWallet(updatedWallet);

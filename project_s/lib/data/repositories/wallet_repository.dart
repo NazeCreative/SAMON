@@ -33,9 +33,6 @@ class WalletRepository {
           .map((doc) => WalletModel.fromFirestore(doc))
           .toList();
 
-      // Sắp xếp theo createdAt trong Dart thay vì trong query
-      wallets.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
       return wallets;
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi lấy danh sách ví: ${e.message}');
@@ -56,8 +53,6 @@ class WalletRepository {
       // Tạo ví mới với userId của người dùng hiện tại
       final WalletModel newWallet = wallet.copyWith(
         userId: currentUser.uid,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
 
       // Thêm vào Firestore
@@ -87,7 +82,6 @@ class WalletRepository {
 
       // Cập nhật ví với thời gian mới
       final WalletModel updatedWallet = wallet.copyWith(
-        updatedAt: DateTime.now(),
       );
 
       // Cập nhật trong Firestore

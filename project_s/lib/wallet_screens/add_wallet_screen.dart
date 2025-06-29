@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../logic/blocs/category/category_bloc.dart';
+import '../logic/blocs/category/category_event.dart';
+import '../logic/blocs/category/category_state.dart';
+import '../data/models/category_model.dart';
+import '../data/models/wallet_model.dart';
 
 class AddWalletScreen extends StatefulWidget {
   const AddWalletScreen({super.key});
@@ -8,28 +14,37 @@ class AddWalletScreen extends StatefulWidget {
 }
 
 class _AddWalletScreenState extends State<AddWalletScreen> {
-  final TextEditingController nameController = TextEditingController();
-  String? _selectedIcon;
+  final TextEditingController balanceController = TextEditingController();
+  String? _selectedCategoryName;
 
-  void _pickImage() {
-    setState(() {
-      _selectedIcon = 'assets/user_icon.png'; // Giả lập icon chọn
-    });
-  }
-
-  void _removeImage() {
-    setState(() {
-      _selectedIcon = null;
-    });
+  @override
+  void initState() {
+    super.initState();
+    context.read<CategoryBloc>().add(LoadCategories());
   }
 
   void _saveWallet() {
-    final name = nameController.text.trim();
-    if (name.isEmpty || _selectedIcon == null) return;
-
+    final balanceText = balanceController.text.trim();
+    if (_selectedCategoryName == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng chọn tên ví'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    double balance = 0.0;
+    if (balanceText.isNotEmpty) {
+      try {
+        balance = double.parse(balanceText);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Số dư không hợp lệ'), backgroundColor: Colors.red),
+        );
+        return;
+      }
+    }
     Navigator.pop(context, {
-      'name': name,
-      'icon': _selectedIcon!,
+      'name': _selectedCategoryName!,
+      'balance': balance,
     });
   }
 
@@ -53,46 +68,58 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Tên ví',
-                labelStyle: TextStyle(color: Colors.white),
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
+            // Chọn tên ví từ categories
             const Align(
               alignment: Alignment.centerLeft,
-              child: Text('Icon ví', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              child: Text('Tên ví', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
             ),
             const SizedBox(height: 8),
-            GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: _selectedIcon != null
-                          ? Image.asset(_selectedIcon!)
-                          : const Icon(Icons.image, size: 40, color: Colors.grey),
+            BlocBuilder<CategoryBloc, CategoryState>(
+              builder: (context, state) {
+                if (state is CategoryLoaded) {
+                  final names = state.categories.map((c) => c.name).toSet().toList();
+                  if (names.isEmpty) {
+                    return const Text('Không có tên ví nào', style: TextStyle(color: Colors.red));
+                  }
+                  return DropdownButtonFormField<String>(
+                    value: _selectedCategoryName,
+                    style: const TextStyle(color: Colors.white),
+                    dropdownColor: Colors.black,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                    if (_selectedIcon != null)
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap: _removeImage,
-                          child: const Icon(Icons.close, size: 18),
-                        ),
-                      ),
-                  ],
+                    hint: const Text('Chọn tên ví', style: TextStyle(color: Colors.grey)),
+                    items: names.map((name) {
+                      return DropdownMenuItem(
+                        value: name,
+                        child: Text(name, style: const TextStyle(color: Colors.white)),
+                      );
+                    }).toList(),
+                    onChanged: (val) => setState(() => _selectedCategoryName = val),
+                  );
+                } else if (state is CategoryLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else {
+                  return const Text('Không thể tải danh sách tên ví', style: TextStyle(color: Colors.red));
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+            // Số dư ban đầu
+            TextField(
+              controller: balanceController,
+              style: const TextStyle(color: Colors.white),
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Số dư ban đầu (VND)',
+                labelStyle: TextStyle(color: Colors.white70),
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
                 ),
               ),
             ),

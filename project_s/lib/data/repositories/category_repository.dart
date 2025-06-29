@@ -15,14 +15,8 @@ class CategoryRepository {
   // Lấy danh sách tất cả danh mục (mặc định + của người dùng)
   Future<List<CategoryModel>> getCategories() async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
-      if (currentUser == null) {
-        throw Exception('Người dùng chưa đăng nhập');
-      }
 
-      // Thực hiện 2 truy vấn riêng biệt và gộp kết quả
-      
       // 1. Lấy danh mục mặc định
       final QuerySnapshot defaultCategoriesSnapshot = await _firestore
           .collection('categories')
@@ -30,21 +24,23 @@ class CategoryRepository {
           .orderBy('name')
           .get();
 
-      // 2. Lấy danh mục của người dùng hiện tại
-      final QuerySnapshot userCategoriesSnapshot = await _firestore
-          .collection('categories')
-          .where('userId', isEqualTo: currentUser.uid)
-          .orderBy('name')
-          .get();
-
-      // Chuyển đổi kết quả thành CategoryModel
       final List<CategoryModel> defaultCategories = defaultCategoriesSnapshot.docs
           .map((doc) => CategoryModel.fromFirestore(doc))
           .toList();
 
-      final List<CategoryModel> userCategories = userCategoriesSnapshot.docs
-          .map((doc) => CategoryModel.fromFirestore(doc))
-          .toList();
+      List<CategoryModel> userCategories = [];
+      if (currentUser != null) {
+        // 2. Lấy danh mục của người dùng hiện tại
+        final QuerySnapshot userCategoriesSnapshot = await _firestore
+            .collection('categories')
+            .where('userId', isEqualTo: currentUser.uid)
+            .orderBy('name')
+            .get();
+
+        userCategories = userCategoriesSnapshot.docs
+            .map((doc) => CategoryModel.fromFirestore(doc))
+            .toList();
+      }
 
       // Gộp 2 danh sách: danh mục mặc định trước, sau đó là danh mục của người dùng
       final List<CategoryModel> allCategories = [
