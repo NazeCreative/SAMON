@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/repositories/transaction_repository.dart';
+import '../../../presentation/bloc/wallet/wallet_bloc.dart';
+import '../../../presentation/bloc/wallet/wallet_event.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';
 
@@ -67,8 +69,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       emit(const TransactionLoading());
       await _transactionRepository.addTransaction(event.transaction);
       emit(const TransactionOperationSuccess('Giao dịch đã được thêm thành công'));
-      // Tải lại danh sách sau khi thêm thành công
+      
+      // Tải lại danh sách giao dịch sau khi thêm thành công
       add(const LoadTransactions());
+      
+      // Thông báo WalletBloc cập nhật (vì số dư ví đã thay đổi)
+      // Lưu ý: Cần truyền context để có thể truy cập WalletBloc
+      // Cách này sẽ được xử lý trong UI layer
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
@@ -82,8 +89,11 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       emit(const TransactionLoading());
       await _transactionRepository.updateTransaction(event.transaction);
       emit(const TransactionOperationSuccess('Giao dịch đã được cập nhật thành công'));
+      
       // Tải lại danh sách sau khi cập nhật thành công
       add(const LoadTransactions());
+      
+      // Thông báo WalletBloc cập nhật (vì số dư ví đã thay đổi)
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
@@ -97,8 +107,11 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       emit(const TransactionLoading());
       await _transactionRepository.deleteTransaction(event.transactionId);
       emit(const TransactionOperationSuccess('Giao dịch đã được xóa thành công'));
+      
       // Tải lại danh sách sau khi xóa thành công
       add(const LoadTransactions());
+      
+      // Thông báo WalletBloc cập nhật (vì số dư ví đã thay đổi)
     } catch (e) {
       emit(TransactionError(e.toString()));
     }

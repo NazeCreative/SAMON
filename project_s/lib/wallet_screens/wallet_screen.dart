@@ -119,25 +119,12 @@ class _WalletScreenState extends State<WalletScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              final result = await Navigator.push(
+                              await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const AddWalletScreen(),
                                 ),
                               );
-                              
-                              if (result != null) {
-                                // Tạo ví mới từ dữ liệu trả về
-                                final wallet = WalletModel(
-                                  name: result['name'],
-                                  icon: result['icon'],
-                                  balance: result['balance'],
-                                  userId: '', // Sẽ được set trong repository
-                                );
-                                    
-                                // Thêm ví mới thông qua BLoC
-                                context.read<WalletBloc>().add(WalletAdded(wallet));
-                              }
                             },
                             child: const CircleAvatar(
                               backgroundColor: Color(0xffffbf0f),

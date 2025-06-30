@@ -53,6 +53,8 @@ class WalletRepository {
       // Tạo ví mới với userId của người dùng hiện tại
       final WalletModel newWallet = wallet.copyWith(
         userId: currentUser.uid,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
 
       // Thêm vào Firestore
@@ -82,6 +84,7 @@ class WalletRepository {
 
       // Cập nhật ví với thời gian mới
       final WalletModel updatedWallet = wallet.copyWith(
+        updatedAt: DateTime.now(),
       );
 
       // Cập nhật trong Firestore

@@ -6,6 +6,8 @@ class WalletModel {
   final String icon;
   final double balance;
   final String userId;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   WalletModel({
     this.id,
@@ -13,17 +15,27 @@ class WalletModel {
     required this.icon,
     this.balance = 0.0,
     required this.userId,
+    this.createdAt,
+    this.updatedAt,
   });
 
   // Create WalletModel from Firestore document snapshot
   factory WalletModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+    DateTime? parseTimestamp(dynamic value) {
+      if (value is Timestamp) return value.toDate();
+      if (value is DateTime) return value;
+      return null;
+    }
+    
     return WalletModel(
       id: doc.id,
       name: data['name'] ?? '',
       icon: data['icon'] ?? '',
       balance: (data['balance'] ?? 0.0).toDouble(),
       userId: data['userId'] ?? '',
+      createdAt: parseTimestamp(data['createdAt']),
+      updatedAt: parseTimestamp(data['updatedAt']),
     );
   }
 
@@ -34,6 +46,8 @@ class WalletModel {
       'icon': icon,
       'balance': balance,
       'userId': userId,
+      if (createdAt != null) 'createdAt': Timestamp.fromDate(createdAt!),
+      if (updatedAt != null) 'updatedAt': Timestamp.fromDate(updatedAt!),
     };
   }
 
@@ -44,6 +58,8 @@ class WalletModel {
     String? icon,
     double? balance,
     String? userId,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return WalletModel(
       id: id ?? this.id,
@@ -51,6 +67,8 @@ class WalletModel {
       icon: icon ?? this.icon,
       balance: balance ?? this.balance,
       userId: userId ?? this.userId,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 

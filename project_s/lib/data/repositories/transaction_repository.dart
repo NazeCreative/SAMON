@@ -134,15 +134,39 @@ class TransactionRepository {
       final TransactionModel newTransaction = transaction.copyWith(
         userId: currentUser.uid,
         createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
 
-      // Thêm vào Firestore
-      await _firestore
-          .collection('transactions')
-          .add(newTransaction.toFirestore());
+      // Sử dụng Firestore Transaction để đảm bảo tính toàn vẹn dữ liệu
+      await _firestore.runTransaction((transaction) async {
+        // Bước 1: Đọc thông tin ví trước
+        final walletRef = _firestore.collection('wallets').doc(newTransaction.walletId);
+        final walletDoc = await transaction.get(walletRef);
 
-      // Cập nhật số dư ví
-      await _updateWalletBalance(newTransaction);
+        if (!walletDoc.exists) {
+          throw Exception('Ví không tồn tại');
+        }
+
+        final walletData = walletDoc.data() as Map<String, dynamic>;
+        final currentBalance = (walletData['balance'] ?? 0.0).toDouble();
+
+        // Tính toán số dư mới
+        double newBalance = currentBalance;
+        if (newTransaction.type == TransactionType.income) {
+          newBalance += newTransaction.amount;
+        } else {
+          newBalance -= newTransaction.amount;
+        }
+
+        // Bước 2: Ghi dữ liệu (tạo transaction mới và cập nhật ví)
+        final transactionRef = _firestore.collection('transactions').doc();
+        transaction.set(transactionRef, newTransaction.toFirestore());
+
+        transaction.update(walletRef, {
+          'balance': newBalance,
+          'updatedAt': Timestamp.fromDate(DateTime.now()),
+        });
+      });
     } on FirebaseException catch (e) {
       throw Exception('Lỗi khi thêm giao dịch: ${e.message}');
     } catch (e) {
