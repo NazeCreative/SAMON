@@ -221,11 +221,6 @@ class WalletItem extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 5),
-          Icon(
-            showBalance ? Icons.visibility : Icons.visibility_off,
-            size: 16,
-            color: Colors.white70,
-          ),
         ],
       ),
       trailing: const Icon(Icons.chevron_right, color: Colors.white),

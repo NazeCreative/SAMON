@@ -217,8 +217,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 'Giao dịch gần đây',
                                 style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
                               ),
-                              TextButton(
-                                onPressed: () {},
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff978fad)),
+                                onPressed: () {
+                                  Navigator.pushNamed(context, '/transaction-detail');
+                                },
                                 child: Row(
                                   children: [
                                     Text('Xem tất cả', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),

@@ -21,7 +21,6 @@ class MyBarChartPage extends StatefulWidget {
 class _MyBarChartPageState extends State<MyBarChartPage> {
   int _selectedTab = 0; // 0: Tuần, 1: Tháng, 2: Quý, 3: Năm
   final List<String> tabs = ['Tuần', 'Tháng', 'Quý', 'Năm'];
-
   List<CategoryModel> _categories = [];
 
   @override
@@ -41,45 +40,80 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
   }
 
   IconData getCategoryIcon(String categoryId) {
-    // Có thể mở rộng để trả về icon phù hợp
     return Icons.category;
   }
 
   Color getCategoryColor(String categoryId) {
-    // Có thể mở rộng để trả về màu phù hợp
     return Colors.grey[800]!;
   }
 
   Map<String, dynamic> _calculateData(List<TransactionModel> transactions) {
-    final now = DateTime.now();
+    final now = DateTime.now(); // 30/06/2025
     List<List<double>> incomeData = [
-      List.filled(7, 0), // Tuần
-      List.filled(6, 0), // Tháng
-      List.filled(4, 0), // Quý (Q1/25, Q2/25, Q3/25, Q4/25)
-      [], // Năm
+      List.filled(7, 0.0), // Tuần: 7 ngày từ ngày mới nhất
+      List.filled(6, 0.0), // Tháng: 6 tháng từ tháng mới nhất
+      List.filled(4, 0.0), // Quý: 4 quý từ quý mới nhất
+      [], // Năm: Động
     ];
     List<List<double>> expenseData = [
-      List.filled(7, 0), // Tuần
-      List.filled(6, 0), // Tháng
-      List.filled(4, 0), // Quý
+      List.filled(7, 0.0), // Tuần
+      List.filled(6, 0.0), // Tháng
+      List.filled(4, 0.0), // Quý
+      [], // Năm
+    ];
+    List<List<String>> dynamicLabels = [
+      [], // Tuần
+      [], // Tháng
+      [], // Quý
       [], // Năm
     ];
 
-    // Tìm các năm có trong giao dịch
+    // Tìm ngày/tháng/quý mới nhất
+    DateTime? latestDate;
+    if (transactions.isNotEmpty) {
+      latestDate = transactions
+          .map((t) => t.date)
+          .reduce((a, b) => a.isAfter(b) ? a : b);
+    } else {
+      latestDate = now;
+    }
+
+    // Tuần: 7 ngày gần nhất từ ngày mới nhất
+    final weekDays = List.generate(7, (i) => latestDate!.subtract(Duration(days: 6 - i)));
+    dynamicLabels[0] = weekDays
+        .map((date) => '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}')
+        .toList();
+
+    // Tháng: 6 tháng từ tháng mới nhất
+    final latestMonth = DateTime(latestDate.year, latestDate.month, 1);
+    dynamicLabels[1] = List.generate(6, (i) {
+      final date = latestMonth.subtract(Duration(days: 30 * i));
+      return '${date.year}-${date.month.toString().padLeft(2, '0')}';
+    })..sort();
+
+    // Quý: 4 quý từ quý mới nhất
+    final latestQuarter = ((latestDate.month - 1) ~/ 3) + 1;
+    final latestQuarterYear = latestDate.year;
+    dynamicLabels[2] = List.generate(4, (i) {
+      final q = latestQuarter - i;
+      final year = latestQuarterYear - (q <= 0 ? 1 : 0);
+      final adjustedQ = q <= 0 ? q + 4 : q;
+      return '$year-Q$adjustedQ';
+    })..sort();
+
+    // Năm: Các năm có giao dịch
     final years = transactions.map((t) => t.date.year).toSet().toList()..sort();
     final yearCount = years.length > 2 ? 2 : years.length;
     incomeData[3] = List.filled(yearCount, 0.0);
     expenseData[3] = List.filled(yearCount, 0.0);
-
-    // Kiểm tra xem có giao dịch trong năm sau (2026) không
-    bool hasFutureYear = transactions.any((t) => t.date.year == now.year + 1);
-
-    // Nếu có giao dịch trong năm sau, mở rộng mảng quý để thêm Q1/2026
-    if (hasFutureYear) {
-      incomeData[2] = List.filled(5, 0.0); // Thêm Q1/2026
-      expenseData[2] = List.filled(5, 0.0);
+    dynamicLabels[3] = years.take(yearCount).map((y) => y.toString()).toList();
+    if (dynamicLabels[3].isEmpty) {
+      dynamicLabels[3] = [now.year.toString()];
+      incomeData[3] = [0.0];
+      expenseData[3] = [0.0];
     }
 
+    // Tính toán dữ liệu
     for (var transaction in transactions) {
       if (transaction.date == null || transaction.amount == null) {
         print('Giao dịch không hợp lệ: ${transaction.toString()}');
@@ -89,8 +123,9 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
       final amount = transaction.amount;
 
       // Tuần
-      if (date.isAfter(now.subtract(Duration(days: 7)))) {
-        final dayIndex = date.weekday - 1; // 0=T2, ..., 6=CN
+      final dayKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      final dayIndex = dynamicLabels[0].indexOf(dayKey);
+      if (dayIndex >= 0) {
         if (transaction.type == TransactionType.income) {
           incomeData[0][dayIndex] += amount;
         } else {
@@ -99,46 +134,31 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
       }
 
       // Tháng
-      if (date.isAfter(now.subtract(Duration(days: 180)))) {
-        final monthDiff = (now.year - date.year) * 12 + (now.month - date.month);
-        if (monthDiff >= 0 && monthDiff < 6) {
-          if (transaction.type == TransactionType.income) {
-            incomeData[1][5 - monthDiff] += amount;
-          } else {
-            expenseData[1][5 - monthDiff] += amount;
-          }
+      final monthKey = '${date.year}-${date.month.toString().padLeft(2, '0')}';
+      final monthIndex = dynamicLabels[1].indexOf(monthKey);
+      if (monthIndex >= 0) {
+        if (transaction.type == TransactionType.income) {
+          incomeData[1][monthIndex] += amount;
+        } else {
+          expenseData[1][monthIndex] += amount;
         }
       }
 
       // Quý
       final quarter = ((date.month - 1) ~/ 3) + 1;
-      final yearDiff = now.year - date.year;
-      if (yearDiff >= -1 && yearDiff <= 1) { // Xem xét năm trước, hiện tại, và năm sau
-        int quarterIndex;
-        if (yearDiff == 0) {
-          // Năm hiện tại (2025): Q1=0, Q2=1, Q3=2, Q4=3
-          quarterIndex = quarter - 1;
-        } else if (yearDiff == 1) {
-          // Năm trước (2024): Không hiển thị trong biểu đồ
-          continue;
-        } else if (yearDiff == -1 && quarter == 1) {
-          // Năm sau (2026): Chỉ Q1/2026 ở index 4
-          quarterIndex = 4;
+      final quarterKey = '${date.year}-Q$quarter';
+      final quarterIndex = dynamicLabels[2].indexOf(quarterKey);
+      if (quarterIndex >= 0) {
+        if (transaction.type == TransactionType.income) {
+          incomeData[2][quarterIndex] += amount;
         } else {
-          continue; // Bỏ qua các quý khác của năm sau
-        }
-        if (quarterIndex >= 0 && quarterIndex < incomeData[2].length) {
-          if (transaction.type == TransactionType.income) {
-            incomeData[2][quarterIndex] += amount;
-          } else {
-            expenseData[2][quarterIndex] += amount;
-          }
+          expenseData[2][quarterIndex] += amount;
         }
       }
 
       // Năm
-      final yearIndex = years.indexOf(date.year);
-      if (yearIndex >= 0 && yearIndex < yearCount) {
+      final yearIndex = dynamicLabels[3].indexOf(date.year.toString());
+      if (yearIndex >= 0) {
         if (transaction.type == TransactionType.income) {
           incomeData[3][yearIndex] += amount;
         } else {
@@ -150,36 +170,66 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
     return {
       'income': incomeData,
       'expense': expenseData,
-      'years': years.take(yearCount).toList(),
-      'hasFutureYear': hasFutureYear,
+      'labels': dynamicLabels,
     };
   }
 
-  List<List<String>> _generateLabels(List<int> years, bool hasFutureYear) {
+  List<List<String>> _generateLabels(List<List<String>> dynamicLabels) {
     final now = DateTime.now();
     List<List<String>> labels = [
-      ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'], // Khớp với weekday: 1=T2, ..., 7=CN
+      [], // Tuần
       [], // Tháng
       [], // Quý
       [], // Năm
     ];
 
-    // Tháng
-    for (int i = 5; i >= 0; i--) {
-      final month = now.month - i;
-      final year = now.year + (month <= 0 ? -1 : 0);
-      final adjustedMonth = month <= 0 ? month + 12 : month;
-      labels[1].add('${adjustedMonth.toString().padLeft(2, '0')}/${year.toString().substring(2)}');
-    }
+    // Tuần: Thứ\nDD/MM
+    labels[0] = dynamicLabels[0].map((dayKey) {
+      final parts = dayKey.split('-');
+      final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
+      final weekday = date.weekday;
+      final weekdayStr = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'][weekday - 1];
+      return '$weekdayStr\n${parts[2]}/${parts[1]}';
+    }).toList();
 
-    // Quý: Q1/25, Q2/25, Q3/25, Q4/25, và thêm Q1/26 nếu có
-    labels[2] = ['Q1/25', 'Q2/25', 'Q3/25', 'Q4/25'];
-    if (hasFutureYear) {
-      labels[2].add('Q1/26');
-    }
+    // Tháng: MM/YY
+    labels[1] = dynamicLabels[1].map((monthKey) {
+      final parts = monthKey.split('-');
+      return '${parts[1]}/${parts[0].substring(2)}';
+    }).toList();
+
+    // Quý: QX/YY
+    labels[2] = dynamicLabels[2].map((quarterKey) {
+      final parts = quarterKey.split('-Q');
+      return 'Q${parts[1]}/${parts[0].substring(2)}';
+    }).toList();
 
     // Năm
-    labels[3] = years.map((year) => year.toString()).toList();
+    labels[3] = dynamicLabels[3];
+
+    // Mặc định nếu không có dữ liệu
+    if (labels[0].isEmpty) {
+      final weekDays = List.generate(7, (i) => now.subtract(Duration(days: 6 - i)));
+      labels[0] = weekDays.map((date) {
+        final weekdayStr = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'][date.weekday - 1];
+        return '$weekdayStr\n${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}';
+      }).toList();
+    }
+    if (labels[1].isEmpty) {
+      labels[1] = List.generate(6, (i) {
+        final date = now.subtract(Duration(days: 30 * i));
+        return '${date.month.toString().padLeft(2, '0')}/${date.year.toString().substring(2)}';
+      })..sort();
+    }
+    if (labels[2].isEmpty) {
+      final currentQuarter = ((now.month - 1) ~/ 3) + 1;
+      labels[2] = List.generate(4, (i) {
+        final q = currentQuarter - i;
+        final year = now.year - (q <= 0 ? 1 : 0);
+        final adjustedQ = q <= 0 ? q + 4 : q;
+        return 'Q$adjustedQ/${year.toString().substring(2)}';
+      })..sort();
+    }
     if (labels[3].isEmpty) {
       labels[3] = [now.year.toString()];
     }
@@ -212,16 +262,22 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                 final data = _calculateData(transactions);
                 final incomeData = data['income'] as List<List<double>>;
                 final expenseData = data['expense'] as List<List<double>>;
-                final years = data['years'] as List<int>;
-                final hasFutureYear = data['hasFutureYear'] as bool;
-                final labels = _generateLabels(years, hasFutureYear);
+                final dynamicLabels = data['labels'] as List<List<String>>;
+                final labels = _generateLabels(dynamicLabels);
 
                 // Debug
-                if (_selectedTab == 2) {
-                  print('Labels quý: ${labels[2]}');
-                  print('Income quý: ${incomeData[2]}');
-                  print('Expense quý: ${expenseData[2]}');
-                }
+                print('Labels tuần: ${labels[0]}');
+                print('Income tuần: ${incomeData[0]}');
+                print('Expense tuần: ${expenseData[0]}');
+                print('Labels tháng: ${labels[1]}');
+                print('Income tháng: ${incomeData[1]}');
+                print('Expense tháng: ${expenseData[1]}');
+                print('Labels quý: ${labels[2]}');
+                print('Income quý: ${incomeData[2]}');
+                print('Expense quý: ${expenseData[2]}');
+                print('Labels năm: ${labels[3]}');
+                print('Income năm: ${incomeData[3]}');
+                print('Expense năm: ${expenseData[3]}');
 
                 final recentTransactions = List<TransactionModel>.from(transactions)
                   ..sort((a, b) => b.date.compareTo(a.date));
@@ -235,10 +291,10 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                             ? null
                             : (index) => setState(() => _selectedTab = index),
                         color: Colors.white,
-                        selectedColor: Color(0xff000000),
+                        selectedColor: const Color(0xff000000),
                         borderColor: Colors.white,
-                        selectedBorderColor: Color(0xffffffff),
-                        fillColor: Color(0xff978fad),
+                        selectedBorderColor: const Color(0xffffffff),
+                        fillColor: const Color(0xff978fad),
                         borderRadius: BorderRadius.circular(8),
                         children: List.generate(tabs.length, (index) {
                           final isSelected = index == _selectedTab;
@@ -253,10 +309,10 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                           );
                         }),
                       ),
-                      AspectRatio(
-                        aspectRatio: 1.5,
+                      SizedBox(
+                        height: 300,
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(20.0),
                           child: BarChart(
                             BarChartData(
                               titlesData: FlTitlesData(
@@ -289,9 +345,13 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                                     getTitlesWidget: (value, meta) {
                                       int idx = value.toInt();
                                       if (idx >= 0 && idx < labels[_selectedTab].length) {
-                                        return Text(
-                                          labels[_selectedTab][idx],
-                                          style: const TextStyle(fontSize: 10, color: Colors.white),
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            labels[_selectedTab][idx],
+                                            style: const TextStyle(fontSize: 10, color: Colors.white),
+                                            textAlign: TextAlign.center,
+                                          ),
                                         );
                                       }
                                       return const Text('');
@@ -306,8 +366,11 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                                     BarChartRodData(toY: incomeData[_selectedTab][i], color: Colors.green, width: 10),
                                     BarChartRodData(toY: expenseData[_selectedTab][i], color: Colors.red, width: 10),
                                   ],
+                                  barsSpace: 4,
                                 );
                               }),
+                              gridData: const FlGridData(show: false),
+                              borderData: FlBorderData(show: false),
                             ),
                           ),
                         ),
@@ -319,11 +382,16 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                           children: [
                             const Text('GIAO DỊCH', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                             ElevatedButton(
-                              style: ElevatedButton.styleFrom(backgroundColor: Color(0xff978fad)),
+                              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff978fad)),
                               onPressed: () {
                                 Navigator.pushNamed(context, '/transaction-detail');
                               },
-                              child: const Text('> Chi tiết', style: TextStyle(color: Colors.white)),
+                              child: Row(
+                                children: [
+                                  Text('Xem tất cả', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                                  Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -338,7 +406,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                         )
                       else
                         ...recentTransactions.take(5).map((transaction) => Card(
-                          color: Color(0xff181829),
+                          color: const Color(0xff181829),
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           child: ListTile(
@@ -351,7 +419,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                               children: [
                                 Text(
                                   transaction.note.isNotEmpty ? transaction.note : transaction.title,
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   (transaction.type == TransactionType.income ? '+' : '-') +
@@ -363,14 +431,17 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                                 ),
                               ],
                             ),
-                            subtitle: Text(getCategoryName(transaction.categoryId), style: TextStyle(color: Colors.white70)),
+                            subtitle: Text(
+                              getCategoryName(transaction.categoryId),
+                              style: const TextStyle(color: Colors.white70),
+                            ),
                             trailing: Text(
                               Formatter.formatDate(transaction.date),
-                              style: TextStyle(color: Colors.white38, fontSize: 12),
+                              style: const TextStyle(color: Colors.white38, fontSize: 12),
                             ),
                           ),
                         )),
-                      SizedBox(height: 100),
+                      const SizedBox(height: 100),
                     ],
                   ),
                 );
