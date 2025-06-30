@@ -12,6 +12,7 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
       : _transactionRepository = transactionRepository,
         super(const TransactionInitial()) {
     on<LoadTransactions>(_onLoadTransactions);
+    on<ResetTransactions>(_onResetTransactions);
     on<LoadTransactionsByWallet>(_onLoadTransactionsByWallet);
     on<LoadTransactionsByDateRange>(_onLoadTransactionsByDateRange);
     on<AddTransaction>(_onAddTransaction);
@@ -30,6 +31,13 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
+  }
+
+  Future<void> _onResetTransactions(
+    ResetTransactions event,
+    Emitter<TransactionState> emit,
+  ) async {
+    emit(const TransactionInitial());
   }
 
   Future<void> _onLoadTransactionsByWallet(

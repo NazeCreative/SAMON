@@ -12,6 +12,10 @@ class LoadCategories extends CategoryEvent {
   const LoadCategories();
 }
 
+class ResetCategories extends CategoryEvent {
+  const ResetCategories();
+}
+
 class LoadCategoriesByType extends CategoryEvent {
   final String type;
 

@@ -12,6 +12,10 @@ class LoadTransactions extends TransactionEvent {
   const LoadTransactions();
 }
 
+class ResetTransactions extends TransactionEvent {
+  const ResetTransactions();
+}
+
 class LoadTransactionsByWallet extends TransactionEvent {
   final String walletId;
 

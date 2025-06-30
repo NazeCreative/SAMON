@@ -11,6 +11,7 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       : _walletRepository = walletRepository,
         super(const WalletInitial()) {
     on<WalletsFetched>(_onWalletsFetched);
+    on<ResetWallets>(_onResetWallets);
     on<WalletAdded>(_onWalletAdded);
     on<WalletUpdated>(_onWalletUpdated);
     on<WalletDeleted>(_onWalletDeleted);
@@ -27,6 +28,13 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
     } catch (e) {
       emit(WalletLoadFailure(e.toString()));
     }
+  }
+
+  Future<void> _onResetWallets(
+    ResetWallets event,
+    Emitter<WalletState> emit,
+  ) async {
+    emit(const WalletInitial());
   }
 
   Future<void> _onWalletAdded(

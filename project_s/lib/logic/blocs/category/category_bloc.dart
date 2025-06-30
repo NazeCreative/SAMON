@@ -10,6 +10,7 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
       : _categoryRepository = categoryRepository,
         super(const CategoryInitial()) {
     on<LoadCategories>(_onLoadCategories);
+    on<ResetCategories>(_onResetCategories);
     on<LoadCategoriesByType>(_onLoadCategoriesByType);
     on<AddCategory>(_onAddCategory);
     on<UpdateCategory>(_onUpdateCategory);
@@ -20,13 +21,20 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     LoadCategories event,
     Emitter<CategoryState> emit,
   ) async {
+    emit(const CategoryLoading());
     try {
-      emit(const CategoryLoading());
       final categories = await _categoryRepository.getCategories();
       emit(CategoryLoaded(categories));
     } catch (e) {
       emit(CategoryError(e.toString()));
     }
+  }
+
+  Future<void> _onResetCategories(
+    ResetCategories event,
+    Emitter<CategoryState> emit,
+  ) async {
+    emit(const CategoryInitial());
   }
 
   Future<void> _onLoadCategoriesByType(

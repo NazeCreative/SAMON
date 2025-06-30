@@ -12,6 +12,10 @@ class WalletsFetched extends WalletEvent {
   const WalletsFetched();
 }
 
+class ResetWallets extends WalletEvent {
+  const ResetWallets();
+}
+
 class WalletAdded extends WalletEvent {
   final WalletModel wallet;
 
