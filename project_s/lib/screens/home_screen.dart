@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../logic/blocs/transaction/transaction_bloc.dart';
@@ -14,8 +13,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../presentation/bloc/wallet/wallet_bloc.dart';
 import '../presentation/bloc/wallet/wallet_state.dart';
+import '../presentation/bloc/wallet/wallet_event.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -30,6 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadUserName();
     context.read<TransactionBloc>().add(LoadTransactions());
     context.read<CategoryBloc>().add(LoadCategories());
+    context.read<WalletBloc>().add(const WalletsFetched());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // This will be called when the widget is rebuilt due to dependency changes
   }
 
   Future<void> _loadUserName() async {
@@ -72,14 +81,24 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: BlocListener<CategoryBloc, CategoryState>(
-        listener: (context, state) {
-          if (state is CategoryLoaded) {
-            setState(() {
-              _categories = state.categories;
-            });
-          }
-        },
+      body: MultiBlocListener(
+        listeners: [
+          BlocListener<CategoryBloc, CategoryState>(
+            listener: (context, state) {
+              if (state is CategoryLoaded) {
+                setState(() {
+                  _categories = state.categories;
+                });
+              }
+            },
+          ),
+          BlocListener<WalletBloc, WalletState>(
+            listener: (context, state) {
+              // Wallet state changes will automatically trigger rebuild
+              // through BlocBuilder below
+            },
+          ),
+        ],
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16),
           child: Column(
@@ -124,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   double totalBalance = 0;
                   if (walletState is WalletLoadSuccess) {
                     final wallets = walletState.wallets;
-                    totalBalance = wallets.fold<double>(0, (sum, wallet) => sum + wallet.balance);
+                    totalBalance = wallets.fold<double>(0, (total, wallet) => total + wallet.balance);
                   }
                   return BlocBuilder<TransactionBloc, TransactionState>(
                     builder: (context, state) {
