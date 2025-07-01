@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 import '../presentation/pages/welcome_page.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -12,6 +15,8 @@ class _AccountScreenState extends State<AccountScreen> {
   String? displayName;
   String? email;
   String? photoURL;
+
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -26,8 +31,80 @@ class _AccountScreenState extends State<AccountScreen> {
       setState(() {
         displayName = doc.data()?['displayName'] ?? user.displayName ?? user.email ?? 'Người dùng';
         email = user.email;
-        photoURL = user.photoURL;
+        photoURL = doc.data()?['photoURL'] ?? user.photoURL;
       });
+    }
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 80,
+      );
+      
+      if (image != null) {
+        await _uploadImage(File(image.path));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi chọn hình ảnh: $e')),
+      );
+    }
+  }
+
+  Future<void> _uploadImage(File imageFile) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+
+      // Hiển thị loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
+        },
+      );
+
+      // Upload lên Firebase Storage
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child('${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      final uploadTask = storageRef.putFile(imageFile);
+      final snapshot = await uploadTask;
+      final downloadURL = await snapshot.ref.getDownloadURL();
+
+      // Cập nhật URL trong Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .update({'photoURL': downloadURL});
+
+      // Cập nhật UI
+      setState(() {
+        photoURL = downloadURL;
+      });
+
+      // Đóng loading
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Cập nhật ảnh đại diện thành công!')),
+      );
+    } catch (e) {
+      // Đóng loading nếu có lỗi
+      Navigator.of(context).pop();
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi khi cập nhật ảnh: $e')),
+      );
     }
   }
 
@@ -54,6 +131,12 @@ class _AccountScreenState extends State<AccountScreen> {
               backgroundImage: (photoURL != null && photoURL!.isNotEmpty)
                   ? NetworkImage(photoURL!)
                   : AssetImage('assets/images/Samon_logo.png') as ImageProvider,
+              onBackgroundImageError: (exception, stackTrace) {
+                // Fallback to default image if network image fails
+                setState(() {
+                  photoURL = null;
+                });
+              },
             ),
             SizedBox(height: 10),
             Text(
@@ -76,7 +159,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               title: Text('Thêm ảnh', style: TextStyle(color: Colors.white)),
               trailing: Icon(Icons.chevron_right, color: Colors.white),
-              onTap: () {},
+              onTap: _pickImage,
             ),
             ListTile(
               leading: Container(

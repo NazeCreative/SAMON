@@ -43,6 +43,10 @@ dependencies:
   
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
+  
+  # Image picker và storage
+  image_picker: ^1.0.7
+  firebase_storage: ^12.0.2
 
 dev_dependencies:
   flutter_test:
