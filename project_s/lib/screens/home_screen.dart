@@ -68,6 +68,19 @@ class _HomeScreenState extends State<HomeScreen> {
     return Colors.grey[800]!;
   }
 
+  String getWalletName(String walletId) {
+    try {
+      final walletState = context.read<WalletBloc>().state;
+      if (walletState is WalletLoadSuccess) {
+        final wallet = walletState.wallets.firstWhere((w) => w.id == walletId);
+        return wallet.name;
+      }
+    } catch (e) {
+      return '';
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -272,27 +285,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                   title: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        transaction.note.isNotEmpty ? transaction.note : transaction.title,
-                                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        (isIncome ? '+' : '-') + Formatter.formatCurrency(transaction.amount),
-                                        style: TextStyle(
-                                          color: isIncome ? Colors.green : Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  subtitle: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
                                       Expanded(
-                                        child: Text(
-                                          Formatter.formatDate(transaction.date),
-                                          style: TextStyle(color: Colors.white38, fontSize: 12),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              transaction.note.isNotEmpty ? transaction.note : transaction.title,
+                                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                            ),
+                                            SizedBox(height: 2),
+                                            Text(
+                                              getWalletName(transaction.walletId),
+                                              style: TextStyle(color: Colors.white70, fontSize: 12),
+                                            ),
+                                          ],
                                         ),
+                                      ),
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Text(
+                                            (isIncome ? '+' : '-') + Formatter.formatCurrency(transaction.amount),
+                                            style: TextStyle(
+                                              color: isIncome ? Colors.green : Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(height: 2),
+                                          Text(
+                                            Formatter.formatDate(transaction.date),
+                                            style: TextStyle(color: Colors.white38, fontSize: 12),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),

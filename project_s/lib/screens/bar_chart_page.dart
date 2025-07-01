@@ -10,6 +10,9 @@ import '../logic/blocs/category/category_event.dart';
 import '../data/models/transaction_model.dart';
 import '../data/models/category_model.dart';
 import '../core/utils/formatter.dart';
+import '../presentation/bloc/wallet/wallet_bloc.dart';
+import '../presentation/bloc/wallet/wallet_state.dart';
+import '../presentation/bloc/wallet/wallet_event.dart';
 
 class MyBarChartPage extends StatefulWidget {
   const MyBarChartPage({super.key});
@@ -28,6 +31,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
     super.initState();
     context.read<TransactionBloc>().add(LoadTransactions());
     context.read<CategoryBloc>().add(LoadCategories());
+    context.read<WalletBloc>().add(const WalletsFetched());
   }
 
   String getCategoryName(String categoryId) {
@@ -45,6 +49,19 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
 
   Color getCategoryColor(String categoryId) {
     return Colors.grey[800]!;
+  }
+
+  String getWalletName(String walletId) {
+    try {
+      final walletState = context.read<WalletBloc>().state;
+      if (walletState is WalletLoadSuccess) {
+        final wallet = walletState.wallets.firstWhere((w) => w.id == walletId);
+        return wallet.name;
+      }
+    } catch (e) {
+      return '';
+    }
+    return '';
   }
 
   Map<String, dynamic> _calculateData(List<TransactionModel> transactions) {
@@ -417,27 +434,41 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                             title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(
-                                  transaction.note.isNotEmpty ? transaction.note : transaction.title,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  (transaction.type == TransactionType.income ? '+' : '-') +
-                                      Formatter.formatCurrency(transaction.amount),
-                                  style: TextStyle(
-                                    color: transaction.type == TransactionType.income ? Colors.green : Colors.red,
-                                    fontWeight: FontWeight.bold,
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        transaction.note.isNotEmpty ? transaction.note : transaction.title,
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      ),
+                                      SizedBox(height: 2),
+                                      Text(
+                                        getWalletName(transaction.walletId),
+                                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      (transaction.type == TransactionType.income ? '+' : '-') +
+                                          Formatter.formatCurrency(transaction.amount),
+                                      style: TextStyle(
+                                        color: transaction.type == TransactionType.income ? Colors.green : Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      Formatter.formatDate(transaction.date),
+                                      style: const TextStyle(color: Colors.white38, fontSize: 12),
+                                    ),
+                                  ],
+                                ),
                               ],
-                            ),
-                            subtitle: Text(
-                              getCategoryName(transaction.categoryId),
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            trailing: Text(
-                              Formatter.formatDate(transaction.date),
-                              style: const TextStyle(color: Colors.white38, fontSize: 12),
                             ),
                           ),
                         )),
