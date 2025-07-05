@@ -42,7 +42,7 @@ class LoginScreenState extends State<LoginScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, '/');
           },
         ),
       ),
@@ -157,10 +157,6 @@ class LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () {},
-                    child: Text('Quên mật khẩu?'),
-                  ),
                   TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/signup');

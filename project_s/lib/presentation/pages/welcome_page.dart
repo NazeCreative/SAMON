@@ -47,32 +47,6 @@ class WelcomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  // Google button (chưa có chức năng)
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.g_mobiledata, color: Colors.red, size: 28),
-                      label: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text('Continue with Google',
-                            style: TextStyle(fontSize: 16, color: Colors.black)),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.black, width: 1.2),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: Colors.white,
-                        alignment: Alignment.centerLeft,
-                      ),
-                      onPressed: () {
-                        // Sau này tích hợp Google login ở đây
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
                   // Email button → Sign Up
                   SizedBox(
                     width: double.infinity,
@@ -110,7 +84,7 @@ class WelcomePage extends StatelessWidget {
                           Navigator.pushNamed(context, '/login');
                         },
                         child: const Text(
-                          'Login',
+                          'Đăng nhập',
                           style: TextStyle(
                             color: Color(0xFF8c09ff),
                             fontWeight: FontWeight.bold,

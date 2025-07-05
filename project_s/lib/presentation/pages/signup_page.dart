@@ -45,7 +45,7 @@ class SignUpScreenState extends State<SignUpScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushNamed(context, '/');
           },
         ),
       ),
@@ -173,19 +173,9 @@ class SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                   SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Hoặc '),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text('Đăng ký với Google'),
-                      ),
-                    ],
-                  ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/login');
                     },
                     child: Text('Đã có tài khoản? Đăng nhập'),
                   ),
