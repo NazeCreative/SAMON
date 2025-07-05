@@ -13,6 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignUpRequested>(_onSignUpRequested);
     on<SignOutRequested>(_onSignOutRequested);
     on<AuthStatusChecked>(_onAuthStatusChecked);
+    on<ForgotPasswordRequested>(_onForgotPasswordRequested);
   }
 
   Future<void> _onSignInRequested(
@@ -92,6 +93,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ));
     } else {
       emit(const AuthInitial());
+    }
+  }
+
+  Future<void> _onForgotPasswordRequested(
+    ForgotPasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthLoadInProgress());
+    try {
+      await _authRepository.sendPasswordResetEmail(email: event.email);
+      emit(const PasswordResetEmailSent());
+    } catch (e) {
+      String errorMessage = 'Gửi email đặt lại mật khẩu thất bại';
+      if (e.toString().contains('Exception:')) {
+        errorMessage = e.toString().replaceAll('Exception: ', '');
+      }
+      emit(AuthFailure(error: errorMessage));
     }
   }
 }

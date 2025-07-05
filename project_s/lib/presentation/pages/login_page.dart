@@ -35,6 +35,15 @@ class LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showForgotPasswordDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => ForgotPasswordDialog(
+        initialEmail: _emailController.text.trim(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,10 +57,7 @@ class LoginScreenState extends State<LoginScreen> {
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          print('LoginPage: Received state: $state');
           if (state is AuthSuccess || state is AuthAuthenticated) {
-            print('LoginPage: Navigating to home page');
-            // Navigate to home page on successful login
             Navigator.pushReplacementNamed(context, '/home');
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -60,8 +66,6 @@ class LoginScreenState extends State<LoginScreen> {
               ),
             );
           } else if (state is AuthFailure) {
-            print('LoginPage: Showing error message: ${state.error}');
-            // Show error message
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error),
@@ -132,6 +136,14 @@ class LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
+                  SizedBox(height: 1),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: _showForgotPasswordDialog,
+                      child: Text('Quên mật khẩu?'),
+                    ),
+                  ),
                   SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
@@ -168,6 +180,113 @@ class LoginScreenState extends State<LoginScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class ForgotPasswordDialog extends StatefulWidget {
+  final String initialEmail;
+
+  const ForgotPasswordDialog({
+    super.key,
+    required this.initialEmail,
+  });
+
+  @override
+  State<ForgotPasswordDialog> createState() => _ForgotPasswordDialogState();
+}
+
+class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
+  late TextEditingController _emailController;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController(text: widget.initialEmail);
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  void _sendResetEmail() {
+    final email = _emailController.text.trim();
+    if (email.isNotEmpty && email.contains('@')) {
+      setState(() {
+        _isLoading = true;
+      });
+      context.read<AuthBloc>().add(ForgotPasswordRequested(email: email));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is PasswordResetEmailSent) {
+          setState(() {
+            _isLoading = false;
+          });
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Email đặt lại mật khẩu đã được gửi! Vui lòng kiểm tra hộp thư của bạn.'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 4),
+            ),
+          );
+        } else if (state is AuthFailure) {
+          setState(() {
+            _isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.error),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      },
+      child: AlertDialog(
+        title: Text('Quên mật khẩu'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu'),
+            SizedBox(height: 16),
+            TextField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: _isLoading ? null : () => Navigator.pop(context),
+            child: Text('Hủy'),
+          ),
+          ElevatedButton(
+            onPressed: _isLoading ? null : _sendResetEmail,
+            child: _isLoading
+                ? SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : Text('Gửi'),
+          ),
+        ],
       ),
     );
   }

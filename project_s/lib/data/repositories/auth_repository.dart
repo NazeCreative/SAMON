@@ -152,4 +152,21 @@ class AuthRepository {
       throw Exception('Không thể tạo tài khoản test: $e');
     }
   }
+
+  // Gửi email reset mật khẩu
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        throw Exception('Không tìm thấy tài khoản với email này');
+      } else if (e.code == 'invalid-email') {
+        throw Exception('Email không hợp lệ');
+      } else {
+        throw Exception('Gửi email đặt lại mật khẩu thất bại: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Gửi email đặt lại mật khẩu thất bại: $e');
+    }
+  }
 }

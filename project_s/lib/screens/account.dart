@@ -156,7 +156,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
                 child: Icon(Icons.add_a_photo, color: Colors.white, size: 20),
               ),
-              title: Text('Thêm ảnh', style: TextStyle(color: Colors.white)),
+              title: Text('Thêm/Cập nhật ảnh', style: TextStyle(color: Colors.white)),
               trailing: Icon(Icons.chevron_right, color: Colors.white),
               onTap: _pickImage,
             ),

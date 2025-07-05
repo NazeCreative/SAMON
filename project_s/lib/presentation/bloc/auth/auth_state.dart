@@ -27,6 +27,14 @@ class AuthSuccess extends AuthState {
   String toString() => 'AuthSuccess()';
 }
 
+// State when password reset email is sent successfully
+class PasswordResetEmailSent extends AuthState {
+  const PasswordResetEmailSent();
+
+  @override
+  String toString() => 'PasswordResetEmailSent()';
+}
+
 // State when user is already authenticated
 class AuthAuthenticated extends AuthState {
   final String userId;

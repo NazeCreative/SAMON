@@ -47,4 +47,14 @@ class AuthStatusChecked extends AuthEvent {
 
   @override
   String toString() => 'AuthStatusChecked()';
+}
+
+// Event for forgot password (send reset email)
+class ForgotPasswordRequested extends AuthEvent {
+  final String email;
+
+  const ForgotPasswordRequested({required this.email});
+
+  @override
+  String toString() => 'ForgotPasswordRequested(email: $email)';
 } 

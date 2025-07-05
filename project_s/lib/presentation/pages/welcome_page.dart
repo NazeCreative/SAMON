@@ -40,35 +40,27 @@ class WelcomePage extends StatelessWidget {
                   const Text('Quản lý chi tiêu đáng tin cậy của bạn',
                       style: TextStyle(fontSize: 16), textAlign: TextAlign.center),
                   const SizedBox(height: 48),
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Cùng bắt đầu...',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                  ),
-                  const SizedBox(height: 16),
 
                   // Email button → Sign Up
                   SizedBox(
                     width: double.infinity,
-                    child: OutlinedButton.icon(
-                      icon: const Icon(Icons.alternate_email,
-                          color: Colors.deepPurple, size: 24),
-                      label: const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text('Continue with Email',
-                            style: TextStyle(fontSize: 16, color: Colors.black)),
-                      ),
+                    child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.black, width: 1.2),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                         backgroundColor: Colors.white,
-                        alignment: Alignment.centerLeft,
+                        alignment: Alignment.center,
                       ),
                       onPressed: () {
                         Navigator.pushNamed(context, '/signup');
                       },
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 12.0),
+                        child: Text('Get Started',
+                            style: TextStyle(fontSize: 16, color: Colors.black)),
+                      ),
                     ),
                   ),
 
