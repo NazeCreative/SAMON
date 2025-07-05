@@ -47,9 +47,10 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // Cho phép tự động điều chỉnh khi bàn phím xuất hiện
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pushNamed(context, '/');
           },
@@ -60,7 +61,7 @@ class LoginScreenState extends State<LoginScreen> {
           if (state is AuthSuccess || state is AuthAuthenticated) {
             Navigator.pushReplacementNamed(context, '/home');
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
+              const SnackBar(
                 content: Text('Đăng nhập thành công!'),
                 backgroundColor: Colors.green,
               ),
@@ -75,18 +76,23 @@ class LoginScreenState extends State<LoginScreen> {
           }
         },
         builder: (context, state) {
-          return Padding(
-            padding: EdgeInsets.all(16.0),
+          return SingleChildScrollView( // Thêm SingleChildScrollView để cuộn
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 16.0,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16.0, // Padding động theo bàn phím
+            ),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Đăng nhập',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -106,7 +112,7 @@ class LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscureText,
@@ -136,44 +142,44 @@ class LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 1),
+                  const SizedBox(height: 1),
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: _showForgotPasswordDialog,
-                      child: Text('Quên mật khẩu?'),
+                      child: const Text('Quên mật khẩu?'),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: state is AuthLoadInProgress ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 15),
-                        backgroundColor: Color(0xFF7F3DFF),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        backgroundColor: const Color(0xFF7F3DFF),
                       ),
                       child: state is AuthLoadInProgress
-                          ? SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              ),
-                            )
-                          : Text(
-                              'Đăng nhập',
-                              style: TextStyle(color: Colors.white),
-                            ),
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                          : const Text(
+                        'Đăng nhập',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/signup');
                     },
-                    child: Text('Chưa có tài khoản? Đăng ký'),
+                    child: const Text('Chưa có tài khoản? Đăng ký'),
                   ),
                 ],
               ),
@@ -233,7 +239,7 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
           });
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Email đặt lại mật khẩu đã được gửi! Vui lòng kiểm tra hộp thư của bạn.'),
               backgroundColor: Colors.green,
               duration: Duration(seconds: 4),
@@ -252,16 +258,16 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
         }
       },
       child: AlertDialog(
-        title: Text('Quên mật khẩu'),
+        title: const Text('Quên mật khẩu'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu'),
-            SizedBox(height: 16),
+            const Text('Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu'),
+            const SizedBox(height: 16),
             TextField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
@@ -271,20 +277,20 @@ class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
         actions: [
           TextButton(
             onPressed: _isLoading ? null : () => Navigator.pop(context),
-            child: Text('Hủy'),
+            child: const Text('Hủy'),
           ),
           ElevatedButton(
             onPressed: _isLoading ? null : _sendResetEmail,
             child: _isLoading
-                ? SizedBox(
-                    height: 16,
-                    width: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Text('Gửi'),
+                ? const SizedBox(
+              height: 16,
+              width: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+                : const Text('Gửi'),
           ),
         ],
       ),

@@ -14,6 +14,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../presentation/bloc/wallet/wallet_bloc.dart';
 import '../presentation/bloc/wallet/wallet_state.dart';
 import '../presentation/bloc/wallet/wallet_event.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // This will be called when the widget is rebuilt due to dependency changes
   }
 
   Future<void> _loadUserInfo() async {
@@ -86,10 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff000000),
+      backgroundColor: const Color(0xff000000),
       appBar: AppBar(
-        backgroundColor: Color(0xff000000),
-        title: Text(
+        backgroundColor: const Color(0xff000000),
+        title: const Text(
           'Trang chủ',
           style: TextStyle(color: Colors.white),
         ),
@@ -110,12 +110,11 @@ class _HomeScreenState extends State<HomeScreen> {
           BlocListener<WalletBloc, WalletState>(
             listener: (context, state) {
               // Wallet state changes will automatically trigger rebuild
-              // through BlocBuilder below
             },
           ),
         ],
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -130,22 +129,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: (photoURL != null && photoURL!.isNotEmpty)
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              photoURL!,
-                              fit: BoxFit.cover,
-                              width: 60,
-                              height: 60,
-                              errorBuilder: (context, error, stackTrace) => Icon(Icons.person, size: 30),
-                            ),
-                          )
-                        : Icon(Icons.person, size: 30),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        photoURL!,
+                        fit: BoxFit.cover,
+                        width: 60,
+                        height: 60,
+                        errorBuilder: (context, error, stackTrace) => const Icon(Icons.person, size: 30),
+                      ),
+                    )
+                        : const Icon(Icons.person, size: 30),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Kính chào!',
                         style: TextStyle(
                           fontSize: 16,
@@ -154,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Text(
                         username ?? 'Đang tải...',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -163,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               BlocBuilder<WalletBloc, WalletState>(
                 builder: (context, walletState) {
                   double totalBalance = 0;
@@ -190,28 +189,35 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Container(
                             width: double.infinity,
-                            padding: EdgeInsets.all(24),
+                            padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Color(0xff22212e),
+                              color: const Color(0xff22212e),
                               borderRadius: BorderRadius.circular(24),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.2),
                                   blurRadius: 8,
-                                  offset: Offset(0, 4),
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text('Tổng số dư', style: TextStyle(color: Colors.white70)),
-                                SizedBox(height: 8),
-                                Text(
+                                const Text('Tổng số dư', style: TextStyle(color: Colors.white70)),
+                                const SizedBox(height: 8),
+                                AutoSizeText(
                                   Formatter.formatCurrency(totalBalance),
-                                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  maxLines: 1,
+                                  minFontSize: 16,
+                                  maxFontSize: 32,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                SizedBox(height: 16),
+                                const SizedBox(height: 16),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
@@ -220,15 +226,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                       children: [
                                         Row(
                                           children: [
-                                            Icon(Icons.arrow_downward, color: Colors.green, size: 18),
-                                            SizedBox(width: 4),
-                                            Text('Tiền thu', style: TextStyle(color: Colors.white70)),
+                                            const Icon(Icons.arrow_downward, color: Colors.green, size: 18),
+                                            const SizedBox(width: 4),
+                                            const Text('Tiền thu', style: TextStyle(color: Colors.white70)),
                                           ],
                                         ),
-                                        SizedBox(height: 4),
+                                        const SizedBox(height: 4),
                                         Text(
                                           Formatter.formatCurrency(totalIncome),
-                                          style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
+                                          style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 16),
                                         ),
                                       ],
                                     ),
@@ -237,15 +243,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                       children: [
                                         Row(
                                           children: [
-                                            Icon(Icons.arrow_upward, color: Colors.red, size: 18),
-                                            SizedBox(width: 4),
-                                            Text('Tiền chi', style: TextStyle(color: Colors.white70)),
+                                            const Icon(Icons.arrow_upward, color: Colors.red, size: 18),
+                                            const SizedBox(width: 4),
+                                            const Text('Tiền chi', style: TextStyle(color: Colors.white70)),
                                           ],
                                         ),
-                                        SizedBox(height: 4),
+                                        const SizedBox(height: 4),
                                         Text(
                                           Formatter.formatCurrency(totalExpense),
-                                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                                          style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
                                         ),
                                       ],
                                     ),
@@ -254,30 +260,49 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Giao dịch gần đây',
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
+                              Expanded(
+                                child: Text(
+                                  'Giao dịch gần đây',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                               ElevatedButton(
-                                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff978fad)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xff978fad),
+                                  minimumSize: const Size(100, 36),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
                                 onPressed: () {
                                   Navigator.pushNamed(context, '/transaction-detail');
                                 },
                                 child: Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Xem tất cả', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                                    Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                                    const Text(
+                                      'Xem tất cả',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
                                   ],
                                 ),
                               ),
                             ],
                           ),
                           if (transactions.isEmpty)
-                            Padding(
+                            const Padding(
                               padding: EdgeInsets.all(20),
                               child: Text('Chưa có giao dịch nào', style: TextStyle(color: Colors.white70)),
                             )
@@ -287,8 +312,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               final icon = getCategoryIcon(transaction.categoryId);
                               final color = getCategoryColor(transaction.categoryId);
                               return Card(
-                                color: Color(0xff181829),
-                                margin: EdgeInsets.symmetric(vertical: 8),
+                                color: const Color(0xff181829),
+                                margin: const EdgeInsets.symmetric(vertical: 8),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                 child: ListTile(
                                   leading: CircleAvatar(
@@ -304,12 +329,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           children: [
                                             Text(
                                               transaction.note.isNotEmpty ? transaction.note : transaction.title,
-                                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            SizedBox(height: 2),
+                                            const SizedBox(height: 2),
                                             Text(
                                               getWalletName(transaction.walletId),
-                                              style: TextStyle(color: Colors.white70, fontSize: 12),
+                                              style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
                                           ],
                                         ),
@@ -324,10 +351,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(height: 2),
+                                          const SizedBox(height: 2),
                                           Text(
                                             Formatter.formatDate(transaction.date),
-                                            style: TextStyle(color: Colors.white38, fontSize: 12),
+                                            style: const TextStyle(color: Colors.white38, fontSize: 12),
                                           ),
                                         ],
                                       ),
@@ -342,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 },
               ),
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
             ],
           ),
         ),

@@ -327,7 +327,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                         }),
                       ),
                       SizedBox(
-                        height: 300,
+                        height: 350,
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: BarChart(
@@ -336,7 +336,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                                 leftTitles: AxisTitles(
                                   sideTitles: SideTitles(
                                     showTitles: true,
-                                    reservedSize: 60,
+                                    reservedSize: 80,
                                     getTitlesWidget: (value, meta) => Padding(
                                       padding: const EdgeInsets.only(right: 8),
                                       child: Text(
@@ -359,6 +359,7 @@ class _MyBarChartPageState extends State<MyBarChartPage> {
                                 bottomTitles: AxisTitles(
                                   sideTitles: SideTitles(
                                     showTitles: true,
+                                    reservedSize: 60,
                                     getTitlesWidget: (value, meta) {
                                       int idx = value.toInt();
                                       if (idx >= 0 && idx < labels[_selectedTab].length) {
