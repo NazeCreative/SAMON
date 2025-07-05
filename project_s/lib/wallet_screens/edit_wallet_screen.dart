@@ -7,6 +7,7 @@ import '../data/models/category_model.dart';
 import '../data/models/wallet_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../core/services/cloudinary_service.dart';
 
 class EditWalletScreen extends StatefulWidget {
   final WalletModel wallet;
@@ -29,7 +30,8 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
     nameController = TextEditingController(text: widget.wallet.name);
     balanceController = TextEditingController(text: widget.wallet.balance.toString());
     _icon = widget.wallet.icon;
-    if (_icon != null && _icon!.startsWith('/')) {
+    // Chỉ tạo File object nếu icon là đường dẫn local và không phải URL
+    if (_icon != null && _icon!.isNotEmpty && !_icon!.startsWith('http') && _icon!.startsWith('/')) {
       _iconFile = File(_icon!);
     }
   }
@@ -45,7 +47,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
     }
   }
 
-  void _updateWallet() {
+  void _updateWallet() async {
     final name = nameController.text.trim();
     final balanceText = balanceController.text.trim();
     if (name.isEmpty) {
@@ -65,10 +67,33 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
         return;
       }
     }
+    
     String iconPath = _icon ?? '';
+    
+    // Nếu có file ảnh mới được chọn, upload lên Cloudinary
     if (_iconFile != null) {
-      iconPath = _iconFile!.path;
+      // Hiển thị loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
+        },
+      );
+      
+      final uploadedUrl = await CloudinaryService.uploadImage(_iconFile!);
+      Navigator.of(context).pop(); // Đóng loading dialog
+      
+      if (uploadedUrl != null) {
+        iconPath = uploadedUrl;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lỗi khi upload icon ví lên Cloudinary'), backgroundColor: Colors.red),
+        );
+        return;
+      }
     }
+    
     final updatedWallet = widget.wallet.copyWith(
       name: name,
       balance: balance,
@@ -162,10 +187,14 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
                     Center(
                       child: _iconFile != null
                           ? Image.file(_iconFile!, width: 60, height: 60, fit: BoxFit.contain)
-                          : (_icon != null
+                          : (_icon != null && _icon!.isNotEmpty
                               ? (_icon!.startsWith('http')
-                                  ? Image.network(_icon!, width: 60, height: 60, fit: BoxFit.contain)
-                                  : Image.asset(_icon!, width: 60, height: 60, fit: BoxFit.contain))
+                                  ? Image.network(_icon!, width: 60, height: 60, fit: BoxFit.contain, errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(Icons.image, size: 40, color: Colors.grey);
+                                    })
+                                  : Image.asset(_icon!, width: 60, height: 60, fit: BoxFit.contain, errorBuilder: (context, error, stackTrace) {
+                                      return const Icon(Icons.image, size: 40, color: Colors.grey);
+                                    }))
                               : const Icon(Icons.image, size: 40, color: Colors.grey)),
                     ),
                     Positioned(

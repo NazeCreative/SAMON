@@ -207,9 +207,13 @@ class WalletItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: buildIcon(wallet.icon),
+      leading: Container(
+        width: 40,
+        height: 40,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: buildIcon(wallet.icon ?? ''),
+        ),
       ),
       title: Text(wallet.name, style: const TextStyle(color: Colors.white)),
       subtitle: Row(
@@ -229,14 +233,116 @@ class WalletItem extends StatelessWidget {
   }
 
   Widget buildIcon(String iconPath) {
-    if (iconPath.startsWith('http')) {
-      return Image.network(iconPath, width: 20, height: 20, fit: BoxFit.cover);
-    } else if (iconPath.startsWith('/') || iconPath.contains('storage')) {
-      // Đường dẫn file hệ thống
-      return Image.file(File(iconPath), width: 20, height: 20, fit: BoxFit.cover);
-    } else {
-      // Asset local
-      return Image.asset(iconPath, width: 20, height: 20, fit: BoxFit.cover);
+    // Handle null or empty iconPath
+    if (iconPath.isEmpty) {
+      return Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.grey[700],
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(
+          Icons.wallet,
+          color: Colors.white,
+          size: 20,
+        ),
+      );
     }
+
+    Widget imageWidget;
+    if (iconPath.startsWith('http')) {
+      // Network image (Cloudinary URL)
+      imageWidget = Image.network(
+        iconPath,
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey[700],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.wallet,
+              color: Colors.white,
+              size: 20,
+            ),
+          );
+        },
+      );
+    } else if (iconPath.startsWith('/') || iconPath.contains('storage')) {
+      // Local file path
+      try {
+        imageWidget = Image.file(
+          File(iconPath),
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.grey[700],
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.wallet,
+                color: Colors.white,
+                size: 20,
+              ),
+            );
+          },
+        );
+      } catch (e) {
+        // Fallback if file doesn't exist
+        imageWidget = Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.grey[700],
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(
+            Icons.wallet,
+            color: Colors.white,
+            size: 20,
+          ),
+        );
+      }
+    } else {
+      // Asset image
+      imageWidget = Image.asset(
+        iconPath,
+        width: 40,
+        height: 40,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey[700],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.wallet,
+              color: Colors.white,
+              size: 20,
+            ),
+          );
+        },
+      );
+    }
+
+    return Container(
+      width: 40,
+      height: 40,
+      child: imageWidget,
+    );
   }
 }
