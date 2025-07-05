@@ -4,6 +4,9 @@ import '../presentation/bloc/wallet/wallet_bloc.dart';
 import '../presentation/bloc/wallet/wallet_event.dart';
 import '../presentation/bloc/wallet/wallet_state.dart';
 import '../data/models/wallet_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import '../core/services/cloudinary_service.dart';
 
 class AddWalletScreen extends StatefulWidget {
   const AddWalletScreen({super.key});
@@ -15,15 +18,27 @@ class AddWalletScreen extends StatefulWidget {
 class _AddWalletScreenState extends State<AddWalletScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
-  String _selectedIcon = 'assets/images/Samon_logo.png'; // Default icon
+  String? _selectedIconAsset = 'assets/images/Samon_logo.png'; // Default asset
+  File? _selectedIconFile;
 
   // Danh sách icon có sẵn
   final List<String> availableIcons = [
     'assets/images/Samon_logo.png',
-    'assets/images/Samon_logo.png', // Có thể thêm nhiều icon khác
+    // Có thể thêm nhiều icon khác
   ];
 
-  void _saveWallet() {
+  Future<void> _pickIconImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, maxWidth: 256, maxHeight: 256, imageQuality: 80);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedIconFile = File(pickedFile.path);
+        _selectedIconAsset = null;
+      });
+    }
+  }
+
+  Future<void> _saveWallet() async {
     final name = nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -52,10 +67,33 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
       }
     }
 
+    // Xử lý icon: nếu là file, upload lên Cloudinary, nếu không thì dùng asset mặc định
+    String iconUrl = _selectedIconAsset ?? '';
+    if (_selectedIconFile != null) {
+      // Hiển thị loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator(color: Colors.white));
+        },
+      );
+      final uploadedUrl = await CloudinaryService.uploadImage(_selectedIconFile!);
+      Navigator.of(context).pop();
+      if (uploadedUrl != null) {
+        iconUrl = uploadedUrl;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lỗi khi upload icon ví lên Cloudinary'), backgroundColor: Colors.red),
+        );
+        return;
+      }
+    }
+
     // Tạo WalletModel với số dư ban đầu do người dùng nhập
     final wallet = WalletModel(
       name: name,
-      icon: _selectedIcon,
+      icon: iconUrl,
       balance: initialBalance, // Số dư ban đầu do người dùng nhập
       userId: '', // Sẽ được set trong repository
     );
@@ -149,11 +187,7 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
               ),
               const SizedBox(height: 8),
               GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedIcon = 'assets/images/Samon_logo.png';
-                  });
-                },
+                onTap: _pickIconImage,
                 child: Container(
                   height: 100,
                   width: 100,
@@ -164,7 +198,14 @@ class _AddWalletScreenState extends State<AddWalletScreen> {
                   child: Stack(
                     children: [
                       Center(
-                        child: Image.asset(_selectedIcon, width: 60, height: 60, fit: BoxFit.contain),
+                        child: _selectedIconFile != null
+                          ? Image.file(_selectedIconFile!, width: 60, height: 60, fit: BoxFit.contain)
+                          : Image.asset(_selectedIconAsset!, width: 60, height: 60, fit: BoxFit.contain),
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Icon(Icons.edit, color: Colors.white),
                       ),
                     ],
                   ),

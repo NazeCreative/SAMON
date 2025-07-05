@@ -5,9 +5,7 @@ import '../presentation/bloc/wallet/wallet_event.dart';
 import '../presentation/bloc/wallet/wallet_state.dart';
 import '../logic/blocs/category/category_bloc.dart';
 import '../logic/blocs/category/category_event.dart';
-import '../logic/blocs/category/category_state.dart';
 import '../data/models/wallet_model.dart';
-import '../data/models/category_model.dart';
 import 'edit_wallet_screen.dart';
 import 'add_wallet_screen.dart';
 import '../core/utils/formatter.dart';
@@ -202,14 +200,32 @@ class WalletItem extends StatelessWidget {
     required this.onTap,
   });
 
+  Widget buildWalletIcon(String icon) {
+    final isNetwork = icon.startsWith('http');
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: isNetwork
+          ? Image.network(
+              icon,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Icon(Icons.account_balance_wallet, size: 32, color: Colors.grey),
+            )
+          : Image.asset(
+              icon,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(wallet.icon, width: 20, height: 20, fit: BoxFit.cover),
-      ),
+      leading: buildWalletIcon(wallet.icon),
       title: Text(wallet.name, style: const TextStyle(color: Colors.white)),
       subtitle: Row(
         children: [

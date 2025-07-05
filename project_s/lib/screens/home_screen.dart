@@ -24,12 +24,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String? username;
+  String? photoURL;
   List<CategoryModel> _categories = [];
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
+    _loadUserInfo();
     context.read<TransactionBloc>().add(LoadTransactions());
     context.read<CategoryBloc>().add(LoadCategories());
     context.read<WalletBloc>().add(const WalletsFetched());
@@ -41,12 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // This will be called when the widget is rebuilt due to dependency changes
   }
 
-  Future<void> _loadUserName() async {
+  Future<void> _loadUserInfo() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
       setState(() {
         username = doc.data()?['displayName'] ?? user.email ?? 'Người dùng';
+        photoURL = doc.data()?['photoURL'];
       });
     }
   }
@@ -126,7 +128,18 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.grey[400],
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.person, size: 30),
+                    child: (photoURL != null && photoURL!.isNotEmpty)
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.network(
+                              photoURL!,
+                              fit: BoxFit.cover,
+                              width: 60,
+                              height: 60,
+                              errorBuilder: (context, error, stackTrace) => Icon(Icons.person, size: 30),
+                            ),
+                          )
+                        : Icon(Icons.person, size: 30),
                   ),
                   SizedBox(width: 12),
                   Column(

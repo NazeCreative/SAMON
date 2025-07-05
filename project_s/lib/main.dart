@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 
-// Pages
+// Pages  
 import 'presentation/pages/welcome_page.dart';
 import 'presentation/pages/login_page.dart';
 import 'presentation/pages/signup_page.dart';

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import '../presentation/pages/welcome_page.dart';
+import '../core/services/cloudinary_service.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -57,9 +57,6 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> _uploadImage(File imageFile) async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return;
-
       // Hiển thị loading
       showDialog(
         context: context,
@@ -71,21 +68,25 @@ class _AccountScreenState extends State<AccountScreen> {
         },
       );
 
-      // Upload lên Firebase Storage
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('profile_images')
-          .child('${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg');
+      // Upload lên Cloudinary
+      final downloadURL = await CloudinaryService.uploadImage(imageFile);
 
-      final uploadTask = storageRef.putFile(imageFile);
-      final snapshot = await uploadTask;
-      final downloadURL = await snapshot.ref.getDownloadURL();
+      if (downloadURL == null) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi khi upload ảnh lên Cloudinary')),
+        );
+        return;
+      }
 
       // Cập nhật URL trong Firestore
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .update({'photoURL': downloadURL});
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .update({'photoURL': downloadURL});
+      }
 
       // Cập nhật UI
       setState(() {
@@ -99,9 +100,7 @@ class _AccountScreenState extends State<AccountScreen> {
         SnackBar(content: Text('Cập nhật ảnh đại diện thành công!')),
       );
     } catch (e) {
-      // Đóng loading nếu có lỗi
       Navigator.of(context).pop();
-      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Lỗi khi cập nhật ảnh: $e')),
       );
