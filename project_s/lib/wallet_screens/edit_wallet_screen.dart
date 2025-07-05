@@ -5,6 +5,8 @@ import '../logic/blocs/category/category_event.dart';
 import '../logic/blocs/category/category_state.dart';
 import '../data/models/category_model.dart';
 import '../data/models/wallet_model.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class EditWalletScreen extends StatefulWidget {
   final WalletModel wallet;
@@ -19,6 +21,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
   late TextEditingController nameController;
   late TextEditingController balanceController;
   String? _icon;
+  File? _iconFile;
 
   @override
   void initState() {
@@ -26,6 +29,20 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
     nameController = TextEditingController(text: widget.wallet.name);
     balanceController = TextEditingController(text: widget.wallet.balance.toString());
     _icon = widget.wallet.icon;
+    if (_icon != null && _icon!.startsWith('/')) {
+      _iconFile = File(_icon!);
+    }
+  }
+
+  Future<void> _pickIconImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, maxWidth: 256, maxHeight: 256, imageQuality: 80);
+    if (pickedFile != null) {
+      setState(() {
+        _iconFile = File(pickedFile.path);
+        _icon = null;
+      });
+    }
   }
 
   void _updateWallet() {
@@ -48,10 +65,14 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
         return;
       }
     }
+    String iconPath = _icon ?? '';
+    if (_iconFile != null) {
+      iconPath = _iconFile!.path;
+    }
     final updatedWallet = widget.wallet.copyWith(
       name: name,
       balance: balance,
-      icon: _icon ?? widget.wallet.icon,
+      icon: iconPath,
     );
     Navigator.pop(context, updatedWallet);
   }
@@ -63,6 +84,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
   void _removeImage() {
     setState(() {
       _icon = null;
+      _iconFile = null;
     });
   }
 
@@ -127,11 +149,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
             ),
             const SizedBox(height: 8),
             GestureDetector(
-              onTap: () {
-                setState(() {
-                  _icon = 'assets/images/Samon_logo.png';
-                });
-              },
+              onTap: _pickIconImage,
               child: Container(
                 height: 100,
                 width: 100,
@@ -142,11 +160,20 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
                 child: Stack(
                   children: [
                     Center(
-                      child: _icon != null
-                          ? Image.asset(_icon!, width: 60, height: 60, fit: BoxFit.contain)
-                          : const Icon(Icons.image, size: 40, color: Colors.grey),
+                      child: _iconFile != null
+                          ? Image.file(_iconFile!, width: 60, height: 60, fit: BoxFit.contain)
+                          : (_icon != null
+                              ? (_icon!.startsWith('http')
+                                  ? Image.network(_icon!, width: 60, height: 60, fit: BoxFit.contain)
+                                  : Image.asset(_icon!, width: 60, height: 60, fit: BoxFit.contain))
+                              : const Icon(Icons.image, size: 40, color: Colors.grey)),
                     ),
-                    if (_icon != null)
+                    Positioned(
+                      right: 0,
+                      bottom: 0,
+                      child: Icon(Icons.edit, color: Colors.white),
+                    ),
+                    if (_iconFile != null || _icon != null)
                       Positioned(
                         top: 4,
                         right: 4,
