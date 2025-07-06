@@ -158,7 +158,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                       ),
                                     );
                                     
-                                    if (result != null) {
+                                    if (result != null && context.mounted) {
                                       if (result is WalletModel) {
                                         // Cập nhật ví
                                         context.read<WalletBloc>().add(WalletUpdated(result));
@@ -205,12 +205,12 @@ class WalletItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      leading: Container(
+      leading: SizedBox(
         width: 40,
         height: 40,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: buildIcon(wallet.icon ?? ''),
+          child: buildIcon(wallet.icon),
         ),
       ),
       title: Text(wallet.name, style: const TextStyle(color: Colors.white)),

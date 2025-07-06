@@ -132,10 +132,6 @@ class MyBarChartPageState extends State<MyBarChartPage> {
 
     // Tính toán dữ liệu
     for (var transaction in transactions) {
-      if (transaction.date == null || transaction.amount == null) {
-        print('Giao dịch không hợp lệ: ${transaction.toString()}');
-        continue;
-      }
       final date = transaction.date;
       final amount = transaction.amount;
 

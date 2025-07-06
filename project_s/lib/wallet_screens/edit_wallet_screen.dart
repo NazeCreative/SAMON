@@ -1,9 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../logic/blocs/category/category_bloc.dart';
-import '../logic/blocs/category/category_event.dart';
-import '../logic/blocs/category/category_state.dart';
-import '../data/models/category_model.dart';
 import '../data/models/wallet_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
