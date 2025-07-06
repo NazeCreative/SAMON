@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/repositories/wallet_repository.dart';
-import '../../../data/models/wallet_model.dart';
 import 'wallet_event.dart';
 import 'wallet_state.dart';
 

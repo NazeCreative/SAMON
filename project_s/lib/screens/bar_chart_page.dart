@@ -18,10 +18,10 @@ class MyBarChartPage extends StatefulWidget {
   const MyBarChartPage({super.key});
 
   @override
-  _MyBarChartPageState createState() => _MyBarChartPageState();
+  MyBarChartPageState createState() => MyBarChartPageState();
 }
 
-class _MyBarChartPageState extends State<MyBarChartPage> {
+class MyBarChartPageState extends State<MyBarChartPage> {
   int _selectedTab = 0; // 0: Tuần, 1: Tháng, 2: Quý, 3: Năm
   final List<String> tabs = ['Tuần', 'Tháng', 'Quý', 'Năm'];
   List<CategoryModel> _categories = [];
