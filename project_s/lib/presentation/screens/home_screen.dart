@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../logic/blocs/transaction/transaction_bloc.dart';
-import '../logic/blocs/transaction/transaction_event.dart';
-import '../logic/blocs/transaction/transaction_state.dart';
-import '../logic/blocs/category/category_bloc.dart';
-import '../logic/blocs/category/category_event.dart';
-import '../logic/blocs/category/category_state.dart';
-import '../data/models/transaction_model.dart';
-import '../data/models/category_model.dart';
-import '../core/utils/formatter.dart';
+import '../../blocs/transaction/transaction_bloc.dart';
+import '../../blocs/transaction/transaction_event.dart';
+import '../../blocs/transaction/transaction_state.dart';
+import '../../blocs/category/category_bloc.dart';
+import '../../blocs/category/category_event.dart';
+import '../../blocs/category/category_state.dart';
+import '../../data/models/transaction_model.dart';
+import '../../data/models/category_model.dart';
+import '../../core/utils/formatter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../presentation/bloc/wallet/wallet_bloc.dart';
-import '../presentation/bloc/wallet/wallet_state.dart';
-import '../presentation/bloc/wallet/wallet_event.dart';
+import '../../blocs/wallet/wallet_bloc.dart';
+import '../../blocs/wallet/wallet_state.dart';
+import '../../blocs/wallet/wallet_event.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 class HomeScreen extends StatefulWidget {

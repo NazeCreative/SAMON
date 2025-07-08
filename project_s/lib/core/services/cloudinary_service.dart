@@ -23,4 +23,4 @@ class CloudinaryService {
       return null;
     }
   }
-} 
+}

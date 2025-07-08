@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:project_s/screens/add_transaction_screen.dart';
-import 'package:project_s/screens/home_screen.dart';
-import 'package:project_s/wallet_screens/wallet_screen.dart';
-import 'package:project_s/screens/bar_chart_page.dart';
-import 'package:project_s/screens/account.dart';
+import 'package:project_s/presentation/screens/add_transaction_screen.dart';
+import 'package:project_s/presentation/screens/home_screen.dart';
+import 'package:project_s/presentation/wallet/wallet_screen.dart';
+import 'package:project_s/presentation/screens/bar_chart_page.dart';
+import 'package:project_s/presentation/screens/account.dart';
 
 class Bottom extends StatefulWidget {
   const Bottom({Key? key}) : super(key: key);

@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../presentation/pages/welcome_page.dart';
-import '../core/services/cloudinary_service.dart';
+import '../auth/welcome_page.dart';
+import '../../core/services/cloudinary_service.dart';
 
 class AccountScreen extends StatefulWidget {
   @override

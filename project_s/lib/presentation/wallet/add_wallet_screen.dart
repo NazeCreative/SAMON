@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../presentation/bloc/wallet/wallet_bloc.dart';
-import '../presentation/bloc/wallet/wallet_event.dart';
-import '../presentation/bloc/wallet/wallet_state.dart';
-import '../data/models/wallet_model.dart';
+import '../../blocs/wallet/wallet_bloc.dart';
+import '../../blocs/wallet/wallet_event.dart';
+import '../../blocs/wallet/wallet_state.dart';
+import '../../data/models/wallet_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../core/services/cloudinary_service.dart';
+import '../../core/services/cloudinary_service.dart';
 
 class AddWalletScreen extends StatefulWidget {
   const AddWalletScreen({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/repositories/transaction_repository.dart';
+import '../../data/repositories/transaction_repository.dart';
 import 'transaction_event.dart';
 import 'transaction_state.dart';
 

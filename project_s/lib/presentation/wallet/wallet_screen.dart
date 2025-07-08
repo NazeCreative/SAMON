@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../presentation/bloc/wallet/wallet_bloc.dart';
-import '../presentation/bloc/wallet/wallet_event.dart';
-import '../presentation/bloc/wallet/wallet_state.dart';
-import '../logic/blocs/category/category_bloc.dart';
-import '../logic/blocs/category/category_event.dart';
-import '../data/models/wallet_model.dart';
+import '../../blocs/wallet/wallet_bloc.dart';
+import '../../blocs/wallet/wallet_event.dart';
+import '../../blocs/wallet/wallet_state.dart';
+import '../../blocs/category/category_bloc.dart';
+import '../../blocs/category/category_event.dart';
+import '../../data/models/wallet_model.dart';
 import 'edit_wallet_screen.dart';
 import 'add_wallet_screen.dart';
-import '../core/utils/formatter.dart';
+import '../../core/utils/formatter.dart';
 import 'dart:io';
 
 String formatVNCurrency(num amount) {

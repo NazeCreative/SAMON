@@ -1,53 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/auth/auth_bloc.dart';
-import '../bloc/auth/auth_event.dart';
-import '../bloc/auth/auth_state.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_event.dart';
+import '../../blocs/auth/auth_state.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  LoginScreenState createState() => LoginScreenState();
+  SignUpScreenState createState() => SignUpScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscureText = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _handleLogin() {
+  void _handleSignUp() {
     if (_formKey.currentState!.validate()) {
       context.read<AuthBloc>().add(
-        SignInRequested(
+        SignUpRequested(
           email: _emailController.text.trim(),
           password: _passwordController.text,
+          displayName: _nameController.text.trim(),
         ),
       );
     }
   }
 
-  void _showForgotPasswordDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => ForgotPasswordDialog(
-        initialEmail: _emailController.text.trim(),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Cho phép tự động điều chỉnh khi bàn phím xuất hiện
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -58,11 +52,11 @@ class LoginScreenState extends State<LoginScreen> {
       ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthSuccess || state is AuthAuthenticated) {
+          if (state is AuthSuccess) {
             Navigator.pushReplacementNamed(context, '/home');
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Đăng nhập thành công!'),
+                content: Text('Đăng ký thành công!'),
                 backgroundColor: Colors.green,
               ),
             );
@@ -76,12 +70,12 @@ class LoginScreenState extends State<LoginScreen> {
           }
         },
         builder: (context, state) {
-          return SingleChildScrollView( // Thêm SingleChildScrollView để cuộn
+          return SingleChildScrollView(
             padding: EdgeInsets.only(
               left: 16.0,
               right: 16.0,
               top: 16.0,
-              bottom: MediaQuery.of(context).viewInsets.bottom + 16.0, // Padding động theo bàn phím
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16.0,
             ),
             child: Form(
               key: _formKey,
@@ -89,8 +83,24 @@ class LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Đăng nhập',
+                    'Đăng ký',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Họ và tên',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng nhập họ và tên';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -142,19 +152,11 @@ class LoginScreenState extends State<LoginScreen> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: 1),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _showForgotPasswordDialog,
-                      child: const Text('Quên mật khẩu?'),
-                    ),
-                  ),
                   const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: state is AuthLoadInProgress ? null : _handleLogin,
+                      onPressed: state is AuthLoadInProgress ? null : _handleSignUp,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         backgroundColor: const Color(0xFF7F3DFF),
@@ -169,7 +171,7 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                       )
                           : const Text(
-                        'Đăng nhập',
+                        'Đăng ký',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
@@ -177,122 +179,15 @@ class LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 10),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/signup');
+                      Navigator.pushNamed(context, '/login');
                     },
-                    child: const Text('Chưa có tài khoản? Đăng ký'),
+                    child: const Text('Đã có tài khoản? Đăng nhập'),
                   ),
                 ],
               ),
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class ForgotPasswordDialog extends StatefulWidget {
-  final String initialEmail;
-
-  const ForgotPasswordDialog({
-    super.key,
-    required this.initialEmail,
-  });
-
-  @override
-  State<ForgotPasswordDialog> createState() => _ForgotPasswordDialogState();
-}
-
-class _ForgotPasswordDialogState extends State<ForgotPasswordDialog> {
-  late TextEditingController _emailController;
-  bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _emailController = TextEditingController(text: widget.initialEmail);
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  void _sendResetEmail() {
-    final email = _emailController.text.trim();
-    if (email.isNotEmpty && email.contains('@')) {
-      setState(() {
-        _isLoading = true;
-      });
-      context.read<AuthBloc>().add(ForgotPasswordRequested(email: email));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is PasswordResetEmailSent) {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Email đặt lại mật khẩu đã được gửi! Vui lòng kiểm tra hộp thư của bạn.'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 4),
-            ),
-          );
-        } else if (state is AuthFailure) {
-          setState(() {
-            _isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.error),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      },
-      child: AlertDialog(
-        title: const Text('Quên mật khẩu'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: _isLoading ? null : () => Navigator.pop(context),
-            child: const Text('Hủy'),
-          ),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _sendResetEmail,
-            child: _isLoading
-                ? const SizedBox(
-              height: 16,
-              width: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
-                : const Text('Gửi'),
-          ),
-        ],
       ),
     );
   }

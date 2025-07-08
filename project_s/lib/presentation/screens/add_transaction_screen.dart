@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../logic/blocs/transaction/transaction_bloc.dart';
-import '../logic/blocs/transaction/transaction_event.dart';
-import '../logic/blocs/transaction/transaction_state.dart';
-import '../presentation/bloc/wallet/wallet_bloc.dart';
-import '../presentation/bloc/wallet/wallet_event.dart';
-import '../presentation/bloc/wallet/wallet_state.dart';
-import '../data/models/transaction_model.dart';
+import '../../blocs/transaction/transaction_bloc.dart';
+import '../../blocs/transaction/transaction_event.dart';
+import '../../blocs/transaction/transaction_state.dart';
+import '../../blocs/wallet/wallet_bloc.dart';
+import '../../blocs/wallet/wallet_event.dart';
+import '../../blocs/wallet/wallet_state.dart';
+import '../../data/models/transaction_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AddTransactionScreen extends StatefulWidget {

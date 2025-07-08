@@ -7,10 +7,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 
 // Pages  
-import 'presentation/pages/welcome_page.dart';
-import 'presentation/pages/login_page.dart';
-import 'presentation/pages/signup_page.dart';
-import 'presentation/widgets/bot_nav_bar.dart';
+import 'presentation/auth/welcome_page.dart';
+import 'presentation/auth/login_page.dart';
+import 'presentation/auth/signup_page.dart';
+import 'widgets/bot_nav_bar.dart';
 
 // Repositories
 import 'data/repositories/auth_repository.dart';
@@ -19,10 +19,10 @@ import 'data/repositories/category_repository.dart';
 import 'data/repositories/transaction_repository.dart';
 
 // BLoCs
-import 'presentation/bloc/auth/auth_bloc.dart';
-import 'presentation/bloc/wallet/wallet_bloc.dart';
-import 'logic/blocs/transaction/transaction_bloc.dart';
-import 'logic/blocs/category/category_bloc.dart';
+import 'blocs/auth/auth_bloc.dart';
+import 'blocs/wallet/wallet_bloc.dart';
+import 'blocs/transaction/transaction_bloc.dart';
+import 'blocs/category/category_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

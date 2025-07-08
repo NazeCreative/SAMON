@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../data/models/wallet_model.dart';
+import '../../data/models/wallet_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import '../core/services/cloudinary_service.dart';
+import '../../core/services/cloudinary_service.dart';
 
 class EditWalletScreen extends StatefulWidget {
   final WalletModel wallet;
