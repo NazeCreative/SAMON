@@ -37,7 +37,7 @@ project_s/
 │   │       └── wallet_repository.dart
 │   │
 │   ├── logic/            # [BUSINESS LOGIC] Quản lý logic nghiệp vụ (BLoC)
-│   │   └── blocs/        # ⚠️ Cần tái cấu trúc
+│   │   └── blocs/       
 │   │       ├── blocs.dart
 │   │       ├── category/
 │   │       │   ├── category_bloc.dart
@@ -49,7 +49,7 @@ project_s/
 │   │           └── transaction_state.dart
 │   │
 │   ├── presentation/     # [PRESENTATION LAYER] Giao diện và BLoC
-│   │   ├── bloc/         # ⚠️ Trùng lặp với logic/blocs
+│   │   ├── bloc/        
 │   │   │   ├── auth/
 │   │   │   │   ├── auth_bloc.dart
 │   │   │   │   ├── auth_event.dart
