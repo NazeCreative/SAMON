@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 class CloudinaryService {
@@ -18,7 +19,7 @@ class CloudinaryService {
       final resJson = json.decode(resStr);
       return resJson['secure_url'];
     } else {
-      print('Cloudinary upload failed: \\${response.statusCode}');
+      log('Cloudinary upload failed: ${response.statusCode}', name: 'CloudinaryService');
       return null;
     }
   }
