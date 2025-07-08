@@ -1,145 +1,103 @@
 # SAMON - Ứng dụng Quản lý Chi tiêu
 
-Ứng dụng quản lý chi tiêu đa nền tảng được phát triển bằng Flutter.
+**SAMON** là một ứng dụng quản lý chi tiêu đa nền tảng, được xây dựng bằng Flutter, giúp bạn theo dõi tình hình tài chính một cách dễ dàng và hiệu quả.
 
-## Cấu trúc Dự án Hiện Tại
+## ✨ Tính năng nổi bật
+
+*   **Xác thực người dùng:** Đăng nhập và đăng ký an toàn.
+*   **Quản lý Ví:** Tạo và quản lý nhiều ví tiền khác nhau.
+*   **Theo dõi Giao dịch:** Thêm, sửa, và xem lại các khoản thu chi.
+*   **Phân loại Giao dịch:** Sắp xếp các giao dịch vào những danh mục tùy chỉnh.
+*   **Trực quan hóa Dữ liệu:** Phân tích chi tiêu qua các biểu đồ báo cáo.
+*   **Đa nền tảng:** Hoạt động trên Android, Web, và Windows từ một mã nguồn duy nhất.
+
+## 🛠️ Công nghệ và Kiến trúc
+
+Dự án được xây dựng với các công nghệ hiện đại và tuân thủ theo nguyên tắc Clean Architecture để đảm bảo khả năng mở rộng và bảo trì.
+
+*   **Framework:** [Flutter](https://flutter.dev/)
+*   **Quản lý Trạng thái (State Management):** [BLoC (Business Logic Component)](https://bloclibrary.dev/)
+*   **Backend & Cơ sở dữ liệu:** [Firebase (Authentication, Firestore)](https://firebase.google.com/)
+*   **Kiến trúc:** Clean Architecture, Repository Pattern.
+
+## 📂 Cấu trúc Dự án
+
+Cấu trúc thư mục được tổ chức theo các lớp của Clean Architecture, tách biệt rõ ràng các mối quan tâm (separation of concerns).
 
 ```
 project_s/
-├── android/              # [PLATFORM] Mã nguồn Android
-├── web/                  # [PLATFORM] Mã nguồn Web
-├── windows/              # [PLATFORM] Mã nguồn Windows
-├── build/                # [BUILD] Thư mục build được tạo tự động
-├── .dart_tool/           # [TOOL] Thư mục cache của Dart
+├── lib/
+│   ├── main.dart                 # Điểm khởi chạy ứng dụng
+│   ├── firebase_options.dart     # Cấu hình Firebase
+│   │
+│   ├── blocs/                    # BLoC - Quản lý trạng thái
+│   │   ├── auth/
+│   │   ├── category/
+│   │   ├── transaction/
+│   │   └── wallet/
+│   │
+│   ├── core/                     # Các tiện ích, dịch vụ và theme cốt lõi
+│   │   ├── services/
+│   │   └── utils/
+│   │
+│   ├── data/                     # Lớp Dữ liệu (Models & Repositories)
+│   │   ├── models/
+│   │   └── repositories/
+│   │
+│   ├── presentation/             # Lớp Giao diện (Màn hình & Widgets)
+│   │   ├── auth/                 # Các màn hình xác thực (Đăng nhập, Đăng ký)
+│   │   ├── screens/              # Các màn hình tính năng chính
+│   │   └── wallet/               # Các màn hình liên quan đến ví
+│   │
+│   └── widgets/                  # Các thành phần UI có thể tái sử dụng
 │
-├── lib/                  # [CORE] Mã nguồn chính của ứng dụng
-│   ├── main.dart         # Điểm khởi chạy ứng dụng
-│   ├── firebase_options.dart # Cấu hình Firebase
-│   │
-│   ├── core/             # [CHUNG] Các thành phần cốt lõi, dùng chung toàn ứng dụng
-│   │   ├── services/     # Kết nối tới các dịch vụ bên ngoài
-│   │   │   ├── firebase_service.dart
-│   │   │   └── cloudinary_service.dart
-│   │   ├── utils/        # Các hàm tiện ích (validators, formatters...)
-│   │   │   └── formatter.dart
-│   │   └── theme/        # Cấu hình giao diện (màu sắc, font chữ...)
-│   │       └── app_theme.dart
-│   │
-│   ├── data/             # [DATA LAYER] Quản lý dữ liệu và logic nghiệp vụ
-│   │   ├── models/       # Định nghĩa các đối tượng dữ liệu
-│   │   │   ├── transaction_model.dart
-│   │   │   ├── category_model.dart
-│   │   │   └── wallet_model.dart
-│   │   └── repositories/ # Nơi xử lý logic lấy/ghi dữ liệu từ các nguồn
-│   │       ├── auth_repository.dart
-│   │       ├── category_repository.dart
-│   │       ├── transaction_repository.dart
-│   │       └── wallet_repository.dart
-│   │
-│   ├── logic/            # [BUSINESS LOGIC] Quản lý logic nghiệp vụ (BLoC)
-│   │   └── blocs/       
-│   │       ├── blocs.dart
-│   │       ├── category/
-│   │       │   ├── category_bloc.dart
-│   │       │   ├── category_event.dart
-│   │       │   └── category_state.dart
-│   │       └── transaction/
-│   │           ├── transaction_bloc.dart
-│   │           ├── transaction_event.dart
-│   │           └── transaction_state.dart
-│   │
-│   ├── presentation/     # [PRESENTATION LAYER] Giao diện và BLoC
-│   │   ├── bloc/        
-│   │   │   ├── auth/
-│   │   │   │   ├── auth_bloc.dart
-│   │   │   │   ├── auth_event.dart
-│   │   │   │   └── auth_state.dart
-│   │   │   ├── summary/
-│   │   │   │   └── summary_bloc.dart
-│   │   │   ├── transaction/
-│   │   │   │   └── transaction_bloc.dart
-│   │   │   └── wallet/
-│   │   │       ├── wallet_bloc.dart
-│   │   │       ├── wallet_event.dart
-│   │   │       └── wallet_state.dart
-│   │   ├── pages/        # Các màn hình hoàn chỉnh của ứng dụng
-│   │   │   ├── login_page.dart
-│   │   │   ├── signup_page.dart
-│   │   │   └── welcome_page.dart
-│   │   └── widgets/      # Các thành phần giao diện nhỏ, có thể tái sử dụng
-│   │       ├── bot_nav_bar.dart
-│   │       ├── custom_button.dart
-│   │       └── transaction_list_item.dart
-│   │
-│   ├── screens/          # [SCREENS] Các màn hình chức năng
-│   │   ├── account.dart
-│   │   ├── add_transaction_screen.dart
-│   │   ├── bar_chart_page.dart
-│   │   └── home_screen.dart
-│   │
-│   └── wallet_screens/   # [WALLET SCREENS] Các màn hình liên quan đến ví
-│       ├── add_wallet_screen.dart
-│       ├── edit_wallet_screen.dart
-│       └── wallet_screen.dart
+├── assets/                       # Chứa các tài nguyên tĩnh (ảnh, font)
 │
-├── assets/               # [ASSETS] Chứa các tài nguyên tĩnh
-│   ├── images/
-│   │   └── Samon_logo.png
-│   └── fonts/
-│       ├── Inter-regular.ttf
-│       └── Slackey-regular.ttf
+├── android/                      # Mã nguồn cho nền tảng Android
+├── web/                          # Mã nguồn cho nền tảng Web
+├── windows/                      # Mã nguồn cho nền tảng Windows
 │
-├── .gitignore            # Khai báo các file/thư mục mà Git sẽ bỏ qua
-├── analysis_options.yaml # Cấu hình các quy tắc phân tích code (linter)
-├── pubspec.yaml          # File quản lý các gói phụ thuộc và assets
-├── pubspec.lock          # File khóa phiên bản dependencies
-├── DATA_LAYER_SUMMARY.md # Tài liệu tóm tắt data layer
-├── FIRESTORE_INDEXES.md  # Tài liệu về Firestore indexes
-└── TROUBLESHOOTING.md    # Hướng dẫn xử lý sự cố
+├── pubspec.yaml                  # Quản lý dependencies và assets của dự án
+└── README.md                     # Tệp README này
 ```
 
+## 🚀 Bắt đầu
 
+### Yêu cầu hệ thống
 
-## Yêu cầu Hệ thống
+*   Flutter SDK (Phiên bản ổn định mới nhất)
+*   Dart SDK (Phiên bản ổn định mới nhất)
+*   Một IDE như Android Studio hoặc VS Code đã cài đặt plugin Flutter.
+*   Git
 
-- Flutter SDK (phiên bản mới nhất)
-- Dart SDK (phiên bản mới nhất)
-- Android Studio / VS Code với Flutter plugin
-- Git
+### Cài đặt
 
-## Cài đặt và Chạy
+1.  **Clone repository về máy:**
+    ```sh
+    git clone https://github.com/your-username/SAMON.git
+    cd SAMON/project_s
+    ```
 
-1. Clone repository:
-```bash
-git clone https://github.com/your-username/SAMON.git
-cd SAMON
-```
+2.  **Cài đặt các dependencies:**
+    ```sh
+    flutter pub get
+    ```
 
-2. Cài đặt dependencies:
-```bash
-flutter pub get
-```
+3.  **Chạy ứng dụng:**
+    ```sh
+    flutter run
+    ```
 
-3. Chạy ứng dụng:
-```bash
-flutter run
-```
+## 🤝 Đóng góp
 
-## Cấu trúc và Quy ước
+Chúng tôi luôn chào đón các đóng góp! Nếu bạn muốn đóng góp cho dự án, vui lòng làm theo các bước sau:
 
-- **Clean Architecture**: Dự án tuân theo nguyên tắc Clean Architecture
-- **BLoC Pattern**: Sử dụng BLoC để quản lý state
-- **Repository Pattern**: Tách biệt logic truy cập dữ liệu
-- **Widget Reusability**: Tối ưu việc tái sử dụng các widget
+1.  Fork dự án này.
+2.  Tạo một branch mới cho tính năng của bạn (`git checkout -b feature/NewFeature`).
+3.  Commit các thay đổi của bạn (`git commit -m 'Add some NewFeature'`).
+4.  Push branch của bạn lên (`git push origin feature/NewFeature`).
+5.  Mở một Pull Request.
 
-## Đóng góp
+## 📄 Giấy phép
 
-1. Fork dự án
-2. Tạo branch mới (`git checkout -b feature/AmazingFeature`)
-3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`)
-4. Push lên branch (`git push origin feature/AmazingFeature`)
-5. Tạo Pull Request
-
-## Giấy phép
-
-Dự án này được cấp phép theo MIT License - xem file [LICENSE](LICENSE) để biết thêm chi tiết.
+Dự án này được cấp phép theo Giấy phép MIT.
