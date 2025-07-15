@@ -1,6 +1,10 @@
 // welcome_page.dart
 import 'package:flutter/material.dart';
 import '../../widgets/bot_nav_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_event.dart';
+import '../../blocs/auth/auth_state.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -92,6 +96,37 @@ class WelcomePage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class AuthWrapper extends StatefulWidget {
+  const AuthWrapper({Key? key}) : super(key: key);
+
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    // Gửi event kiểm tra trạng thái đăng nhập khi widget khởi tạo
+    context.read<AuthBloc>().add(AuthStatusChecked());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          // Nếu đã đăng nhập, chuyển sang màn hình chính
+          Navigator.pushReplacementNamed(context, '/home');
+        } else if (state is AuthInitial) {
+          // Nếu chưa đăng nhập, ở lại màn hình welcome
+        }
+      },
+      child: const WelcomePage(),
     );
   }
 }
