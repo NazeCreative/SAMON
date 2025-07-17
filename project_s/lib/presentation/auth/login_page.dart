@@ -47,7 +47,7 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Cho phép tự động điều chỉnh khi bàn phím xuất hiện
+      resizeToAvoidBottomInset: true, 
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

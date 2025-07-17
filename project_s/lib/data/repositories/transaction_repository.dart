@@ -16,27 +16,22 @@ class TransactionRepository {
         _firebaseAuth = firebaseAuth,
         _walletRepository = walletRepository;
 
-  // Lấy danh sách giao dịch của người dùng
   Future<List<TransactionModel>> getTransactions() async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Tạo query để lấy các giao dịch của người dùng hiện tại
       final QuerySnapshot snapshot = await _firestore
           .collection('transactions')
           .where('userId', isEqualTo: currentUser.uid)
           .get();
 
-      // Chuyển đổi các document thành TransactionModel
       final List<TransactionModel> transactions = snapshot.docs
           .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
 
-      // Sắp xếp theo date và createdAt trong Dart thay vì trong query
       transactions.sort((a, b) {
         int dateComparison = b.date.compareTo(a.date);
         if (dateComparison != 0) return dateComparison;
@@ -51,7 +46,6 @@ class TransactionRepository {
     }
   }
 
-  // Lấy giao dịch theo ví
   Future<List<TransactionModel>> getTransactionsByWallet(String walletId) async {
     try {
       final User? currentUser = _firebaseAuth.currentUser;
@@ -69,7 +63,6 @@ class TransactionRepository {
           .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
 
-      // Sắp xếp theo date và createdAt trong Dart
       transactions.sort((a, b) {
         int dateComparison = b.date.compareTo(a.date);
         if (dateComparison != 0) return dateComparison;
@@ -84,7 +77,6 @@ class TransactionRepository {
     }
   }
 
-  // Lấy giao dịch theo khoảng thời gian
   Future<List<TransactionModel>> getTransactionsByDateRange(
     DateTime startDate,
     DateTime endDate,
@@ -106,7 +98,6 @@ class TransactionRepository {
           .map((doc) => TransactionModel.fromFirestore(doc))
           .toList();
 
-      // Sắp xếp theo date và createdAt trong Dart
       transactions.sort((a, b) {
         int dateComparison = b.date.compareTo(a.date);
         if (dateComparison != 0) return dateComparison;
@@ -121,25 +112,20 @@ class TransactionRepository {
     }
   }
 
-  // Thêm giao dịch mới
   Future<void> addTransaction(TransactionModel transaction) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Tạo giao dịch mới với userId của người dùng hiện tại
       final TransactionModel newTransaction = transaction.copyWith(
         userId: currentUser.uid,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      // Sử dụng Firestore Transaction để đảm bảo tính toàn vẹn dữ liệu
       await _firestore.runTransaction((transaction) async {
-        // Bước 1: Đọc thông tin ví trước
         final walletRef = _firestore.collection('wallets').doc(newTransaction.walletId);
         final walletDoc = await transaction.get(walletRef);
 
@@ -150,7 +136,6 @@ class TransactionRepository {
         final walletData = walletDoc.data() as Map<String, dynamic>;
         final currentBalance = (walletData['balance'] ?? 0.0).toDouble();
 
-        // Tính toán số dư mới
         double newBalance = currentBalance;
         if (newTransaction.type == TransactionType.income) {
           newBalance += newTransaction.amount;
@@ -158,7 +143,6 @@ class TransactionRepository {
           newBalance -= newTransaction.amount;
         }
 
-        // Bước 2: Ghi dữ liệu (tạo transaction mới và cập nhật ví)
         final transactionRef = _firestore.collection('transactions').doc();
         transaction.set(transactionRef, newTransaction.toFirestore());
 
@@ -174,21 +158,17 @@ class TransactionRepository {
     }
   }
 
-  // Cập nhật giao dịch
   Future<void> updateTransaction(TransactionModel transaction) async {
     try {
-      // Kiểm tra xem giao dịch có ID không
       if (transaction.id == null) {
         throw Exception('ID giao dịch không hợp lệ');
       }
 
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Lấy giao dịch cũ để tính toán lại số dư
       final DocumentSnapshot oldDoc = await _firestore
           .collection('transactions')
           .doc(transaction.id)
@@ -200,23 +180,19 @@ class TransactionRepository {
 
       final TransactionModel oldTransaction = TransactionModel.fromFirestore(oldDoc);
 
-      // Kiểm tra quyền sở hữu
       if (oldTransaction.userId != currentUser.uid) {
         throw Exception('Không có quyền cập nhật giao dịch này');
       }
 
-      // Cập nhật giao dịch với thời gian mới
       final TransactionModel updatedTransaction = transaction.copyWith(
         createdAt: DateTime.now(),
       );
 
-      // Cập nhật trong Firestore
       await _firestore
           .collection('transactions')
           .doc(transaction.id)
           .update(updatedTransaction.toFirestore());
 
-      // Cập nhật số dư ví (hoàn tác giao dịch cũ và áp dụng giao dịch mới)
       await _revertWalletBalance(oldTransaction);
       await _updateWalletBalance(updatedTransaction);
     } on FirebaseException catch (e) {
@@ -230,16 +206,13 @@ class TransactionRepository {
     }
   }
 
-  // Xóa giao dịch
   Future<void> deleteTransaction(String transactionId) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Lấy giao dịch trước khi xóa để tính toán lại số dư
       final DocumentSnapshot doc = await _firestore
           .collection('transactions')
           .doc(transactionId)
@@ -251,18 +224,15 @@ class TransactionRepository {
 
       final TransactionModel transaction = TransactionModel.fromFirestore(doc);
 
-      // Kiểm tra quyền sở hữu
       if (transaction.userId != currentUser.uid) {
         throw Exception('Không có quyền xóa giao dịch này');
       }
 
-      // Xóa giao dịch khỏi Firestore
       await _firestore
           .collection('transactions')
           .doc(transactionId)
           .delete();
 
-      // Hoàn tác số dư ví
       await _revertWalletBalance(transaction);
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
@@ -275,16 +245,13 @@ class TransactionRepository {
     }
   }
 
-  // Lấy giao dịch theo ID
   Future<TransactionModel?> getTransactionById(String transactionId) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Lấy document từ Firestore
       final DocumentSnapshot doc = await _firestore
           .collection('transactions')
           .doc(transactionId)
@@ -296,7 +263,6 @@ class TransactionRepository {
 
       final TransactionModel transaction = TransactionModel.fromFirestore(doc);
 
-      // Kiểm tra quyền sở hữu
       if (transaction.userId != currentUser.uid) {
         throw Exception('Không có quyền truy cập giao dịch này');
       }
@@ -309,16 +275,13 @@ class TransactionRepository {
     }
   }
 
-  // Cập nhật số dư ví khi thêm giao dịch
   Future<void> _updateWalletBalance(TransactionModel transaction) async {
     try {
-      // Lấy thông tin ví
       final wallet = await _walletRepository.getWalletById(transaction.walletId);
       if (wallet == null) {
         throw Exception('Ví không tồn tại');
       }
 
-      // Tính toán số dư mới
       double newBalance = wallet.balance;
       if (transaction.type == TransactionType.income) {
         newBalance += transaction.amount;
@@ -326,7 +289,6 @@ class TransactionRepository {
         newBalance -= transaction.amount;
       }
 
-      // Cập nhật số dư ví
       final updatedWallet = wallet.copyWith(
         balance: newBalance,
       );
@@ -337,24 +299,20 @@ class TransactionRepository {
     }
   }
 
-  // Hoàn tác số dư ví khi xóa hoặc cập nhật giao dịch
   Future<void> _revertWalletBalance(TransactionModel transaction) async {
     try {
-      // Lấy thông tin ví
       final wallet = await _walletRepository.getWalletById(transaction.walletId);
       if (wallet == null) {
         throw Exception('Ví không tồn tại');
       }
 
-      // Tính toán số dư mới (hoàn tác giao dịch)
       double newBalance = wallet.balance;
       if (transaction.type == TransactionType.income) {
-        newBalance -= transaction.amount; // Hoàn tác thu nhập
+        newBalance -= transaction.amount; 
       } else {
-        newBalance += transaction.amount; // Hoàn tác chi tiêu
+        newBalance += transaction.amount; 
       }
 
-      // Cập nhật số dư ví
       final updatedWallet = wallet.copyWith(
         balance: newBalance,
       );
@@ -365,7 +323,6 @@ class TransactionRepository {
     }
   }
 
-  // Tính tổng thu nhập trong khoảng thời gian
   Future<double> getTotalIncome(DateTime startDate, DateTime endDate) async {
     try {
       final transactions = await getTransactionsByDateRange(startDate, endDate);
@@ -381,7 +338,6 @@ class TransactionRepository {
     }
   }
 
-  // Tính tổng chi tiêu trong khoảng thời gian
   Future<double> getTotalExpense(DateTime startDate, DateTime endDate) async {
     try {
       final transactions = await getTransactionsByDateRange(startDate, endDate);

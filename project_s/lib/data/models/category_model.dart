@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class CategoryModel {
   final String? id;
   final String name;
-  final String type; // 'income' hoặc 'expense'
+  final String type; 
   final String icon;
   final String color;
   final bool isDefault;
@@ -23,13 +23,12 @@ class CategoryModel {
     required this.updatedAt,
   });
 
-  // Create CategoryModel from Firestore document snapshot
   factory CategoryModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return CategoryModel(
       id: doc.id,
       name: data['name'] ?? '',
-      type: data['type'] ?? 'expense', // Mặc định là expense
+      type: data['type'] ?? 'expense', 
       icon: data['icon'] ?? '',
       color: data['color'] ?? '#000000',
       isDefault: data['isDefault'] ?? false,
@@ -39,7 +38,6 @@ class CategoryModel {
     );
   }
 
-  // Convert CategoryModel to Map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -53,7 +51,6 @@ class CategoryModel {
     };
   }
 
-  // Create a copy of CategoryModel with updated fields
   CategoryModel copyWith({
     String? id,
     String? name,

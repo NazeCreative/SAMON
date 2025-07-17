@@ -12,11 +12,9 @@ import '../../core/utils/formatter.dart';
 import 'dart:io';
 
 String formatVNCurrency(num amount) {
-  // Nếu đã có Formatter.formatCurrency thì dùng luôn
   try {
     return Formatter.formatCurrency(amount.toDouble());
   } catch (e) {
-    // Nếu không có Formatter, dùng cách thủ công
     return amount.toStringAsFixed(0).replaceAllMapped(
       RegExp(r'\B(?=(\d{3})+(?!\d))'),
       (match) => '.',
@@ -160,10 +158,8 @@ class _WalletScreenState extends State<WalletScreen> {
                                     
                                     if (result != null && context.mounted) {
                                       if (result is WalletModel) {
-                                        // Cập nhật ví
                                         context.read<WalletBloc>().add(WalletUpdated(result));
                                       } else if (result is Map<String, dynamic> && result['action'] == 'delete') {
-                                        // Xóa ví
                                         context.read<WalletBloc>().add(WalletDeleted(result['walletId']));
                                       }
                                     }
@@ -231,7 +227,6 @@ class WalletItem extends StatelessWidget {
   }
 
   Widget buildIcon(String iconPath) {
-    // Handle null or empty iconPath
     if (iconPath.isEmpty) {
       return Container(
         width: 40,
@@ -250,7 +245,6 @@ class WalletItem extends StatelessWidget {
 
     Widget imageWidget;
     if (iconPath.startsWith('http')) {
-      // Network image (Cloudinary URL)
       imageWidget = Image.network(
         iconPath,
         width: 40,
@@ -271,9 +265,8 @@ class WalletItem extends StatelessWidget {
             ),
           );
         },
-      );
+              );
     } else if (iconPath.startsWith('/') || iconPath.contains('storage')) {
-      // Local file path
       try {
         imageWidget = Image.file(
           File(iconPath),
@@ -297,7 +290,6 @@ class WalletItem extends StatelessWidget {
           },
         );
       } catch (e) {
-        // Fallback if file doesn't exist
         imageWidget = Container(
           width: 40,
           height: 40,
@@ -313,7 +305,6 @@ class WalletItem extends StatelessWidget {
         );
       }
     } else {
-      // Asset image
       imageWidget = Image.asset(
         iconPath,
         width: 40,

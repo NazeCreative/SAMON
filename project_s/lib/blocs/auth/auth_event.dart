@@ -1,9 +1,7 @@
-// Abstract base class for all authentication events
 abstract class AuthEvent {
   const AuthEvent();
 }
 
-// Event for user sign up request
 class SignUpRequested extends AuthEvent {
   final String email;
   final String password;
@@ -19,7 +17,6 @@ class SignUpRequested extends AuthEvent {
   String toString() => 'SignUpRequested(email: $email, displayName: $displayName)';
 }
 
-// Event for user sign in request
 class SignInRequested extends AuthEvent {
   final String email;
   final String password;
@@ -33,7 +30,6 @@ class SignInRequested extends AuthEvent {
   String toString() => 'SignInRequested(email: $email)';
 }
 
-// Event for user sign out request
 class SignOutRequested extends AuthEvent {
   const SignOutRequested();
 
@@ -41,7 +37,6 @@ class SignOutRequested extends AuthEvent {
   String toString() => 'SignOutRequested()';
 }
 
-// Event to check current authentication status
 class AuthStatusChecked extends AuthEvent {
   const AuthStatusChecked();
 
@@ -49,7 +44,6 @@ class AuthStatusChecked extends AuthEvent {
   String toString() => 'AuthStatusChecked()';
 }
 
-// Event for forgot password (send reset email)
 class ForgotPasswordRequested extends AuthEvent {
   final String email;
 

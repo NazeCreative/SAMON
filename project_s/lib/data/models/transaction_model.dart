@@ -29,7 +29,6 @@ class TransactionModel {
     required this.updatedAt,
   });
 
-  // Create TransactionModel from Firestore document snapshot
   factory TransactionModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     DateTime parseTimestamp(dynamic value) {
@@ -52,7 +51,6 @@ class TransactionModel {
     );
   }
 
-  // Convert TransactionModel to Map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'title': title,
@@ -68,7 +66,6 @@ class TransactionModel {
     };
   }
 
-  // Create a copy of TransactionModel with updated fields
   TransactionModel copyWith({
     String? id,
     String? title,

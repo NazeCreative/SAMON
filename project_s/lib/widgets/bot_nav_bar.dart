@@ -22,18 +22,14 @@ class _BottomState extends State<Bottom> {
     final now = DateTime.now();
     const maxDuration = Duration(seconds: 2);
     
-    // Nếu đã bấm back trước đó trong vòng 2 giây
     if (_lastBackPressed != null && 
         now.difference(_lastBackPressed!) <= maxDuration) {
-      // Thoát ứng dụng
       SystemNavigator.pop();
       return false;
     }
     
-    // Lần đầu bấm back hoặc đã quá 2 giây
     _lastBackPressed = now;
     
-    // Hiển thị dialog xác nhận
     return await _showExitDialog() ?? false;
   }
 

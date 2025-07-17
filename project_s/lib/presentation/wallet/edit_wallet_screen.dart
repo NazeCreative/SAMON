@@ -25,7 +25,6 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
     nameController = TextEditingController(text: widget.wallet.name);
     balanceController = TextEditingController(text: widget.wallet.balance.toString());
     _icon = widget.wallet.icon;
-    // Chỉ tạo File object nếu icon là đường dẫn local và không phải URL
     if (_icon != null && _icon!.isNotEmpty && !_icon!.startsWith('http') && _icon!.startsWith('/')) {
       _iconFile = File(_icon!);
     }
@@ -65,9 +64,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
     
     String iconPath = _icon ?? '';
     
-    // Nếu có file ảnh mới được chọn, upload lên Cloudinary
     if (_iconFile != null) {
-      // Hiển thị loading
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -77,7 +74,7 @@ class _EditWalletScreenState extends State<EditWalletScreen> {
       );
       
       final uploadedUrl = await CloudinaryService.uploadImage(_iconFile!);
-      Navigator.of(context).pop(); // Đóng loading dialog
+      Navigator.of(context).pop();
       
       if (uploadedUrl != null) {
         iconPath = uploadedUrl;

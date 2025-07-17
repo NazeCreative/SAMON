@@ -22,7 +22,7 @@ class MyBarChartPage extends StatefulWidget {
 }
 
 class MyBarChartPageState extends State<MyBarChartPage> {
-  int _selectedTab = 0; // 0: Tuần, 1: Tháng, 2: Quý, 3: Năm
+  int _selectedTab = 0; 
   final List<String> tabs = ['Tuần', 'Tháng', 'Quý', 'Năm'];
   List<CategoryModel> _categories = [];
 
@@ -67,25 +67,24 @@ class MyBarChartPageState extends State<MyBarChartPage> {
   Map<String, dynamic> _calculateData(List<TransactionModel> transactions) {
     final now = DateTime.now(); // 30/06/2025
     List<List<double>> incomeData = [
-      List.filled(7, 0.0), // Tuần: 7 ngày từ ngày mới nhất
-      List.filled(6, 0.0), // Tháng: 6 tháng từ tháng mới nhất
-      List.filled(4, 0.0), // Quý: 4 quý từ quý mới nhất
-      [], // Năm: Động
+      List.filled(7, 0.0), 
+      List.filled(6, 0.0), 
+      List.filled(4, 0.0), 
+      [], 
     ];
     List<List<double>> expenseData = [
-      List.filled(7, 0.0), // Tuần
-      List.filled(6, 0.0), // Tháng
-      List.filled(4, 0.0), // Quý
-      [], // Năm
+      List.filled(7, 0.0), 
+      List.filled(6, 0.0), 
+      List.filled(4, 0.0), 
+      [], 
     ];
     List<List<String>> dynamicLabels = [
-      [], // Tuần
-      [], // Tháng
-      [], // Quý
-      [], // Năm
+      [], 
+      [], 
+      [], 
+      [], 
     ];
 
-    // Tìm ngày/tháng/quý mới nhất
     DateTime? latestDate;
     if (transactions.isNotEmpty) {
       latestDate = transactions
@@ -95,20 +94,17 @@ class MyBarChartPageState extends State<MyBarChartPage> {
       latestDate = now;
     }
 
-    // Tuần: 7 ngày gần nhất từ ngày mới nhất
     final weekDays = List.generate(7, (i) => latestDate!.subtract(Duration(days: 6 - i)));
     dynamicLabels[0] = weekDays
         .map((date) => '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}')
         .toList();
 
-    // Tháng: 6 tháng từ tháng mới nhất
     final latestMonth = DateTime(latestDate.year, latestDate.month, 1);
     dynamicLabels[1] = List.generate(6, (i) {
       final date = latestMonth.subtract(Duration(days: 30 * i));
       return '${date.year}-${date.month.toString().padLeft(2, '0')}';
     })..sort();
 
-    // Quý: 4 quý từ quý mới nhất
     final latestQuarter = ((latestDate.month - 1) ~/ 3) + 1;
     final latestQuarterYear = latestDate.year;
     dynamicLabels[2] = List.generate(4, (i) {
@@ -118,7 +114,6 @@ class MyBarChartPageState extends State<MyBarChartPage> {
       return '$year-Q$adjustedQ';
     })..sort();
 
-    // Năm: Các năm có giao dịch
     final years = transactions.map((t) => t.date.year).toSet().toList()..sort();
     final yearCount = years.length > 2 ? 2 : years.length;
     incomeData[3] = List.filled(yearCount, 0.0);
@@ -130,12 +125,10 @@ class MyBarChartPageState extends State<MyBarChartPage> {
       expenseData[3] = [0.0];
     }
 
-    // Tính toán dữ liệu
     for (var transaction in transactions) {
       final date = transaction.date;
       final amount = transaction.amount;
 
-      // Tuần
       final dayKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
       final dayIndex = dynamicLabels[0].indexOf(dayKey);
       if (dayIndex >= 0) {
@@ -146,7 +139,6 @@ class MyBarChartPageState extends State<MyBarChartPage> {
         }
       }
 
-      // Tháng
       final monthKey = '${date.year}-${date.month.toString().padLeft(2, '0')}';
       final monthIndex = dynamicLabels[1].indexOf(monthKey);
       if (monthIndex >= 0) {
@@ -157,7 +149,6 @@ class MyBarChartPageState extends State<MyBarChartPage> {
         }
       }
 
-      // Quý
       final quarter = ((date.month - 1) ~/ 3) + 1;
       final quarterKey = '${date.year}-Q$quarter';
       final quarterIndex = dynamicLabels[2].indexOf(quarterKey);
@@ -169,7 +160,6 @@ class MyBarChartPageState extends State<MyBarChartPage> {
         }
       }
 
-      // Năm
       final yearIndex = dynamicLabels[3].indexOf(date.year.toString());
       if (yearIndex >= 0) {
         if (transaction.type == TransactionType.income) {
@@ -190,13 +180,12 @@ class MyBarChartPageState extends State<MyBarChartPage> {
   List<List<String>> _generateLabels(List<List<String>> dynamicLabels) {
     final now = DateTime.now();
     List<List<String>> labels = [
-      [], // Tuần
-      [], // Tháng
-      [], // Quý
-      [], // Năm
+      [], 
+      [], 
+      [], 
+      [], 
     ];
 
-    // Tuần: Thứ\nDD/MM
     labels[0] = dynamicLabels[0].map((dayKey) {
       final parts = dayKey.split('-');
       final date = DateTime(int.parse(parts[0]), int.parse(parts[1]), int.parse(parts[2]));
@@ -205,22 +194,18 @@ class MyBarChartPageState extends State<MyBarChartPage> {
       return '$weekdayStr\n${parts[2]}/${parts[1]}';
     }).toList();
 
-    // Tháng: MM/YY
     labels[1] = dynamicLabels[1].map((monthKey) {
       final parts = monthKey.split('-');
       return '${parts[1]}/${parts[0].substring(2)}';
     }).toList();
 
-    // Quý: QX/YY
     labels[2] = dynamicLabels[2].map((quarterKey) {
       final parts = quarterKey.split('-Q');
       return 'Q${parts[1]}/${parts[0].substring(2)}';
     }).toList();
 
-    // Năm
     labels[3] = dynamicLabels[3];
 
-    // Mặc định nếu không có dữ liệu
     if (labels[0].isEmpty) {
       final weekDays = List.generate(7, (i) => now.subtract(Duration(days: 6 - i)));
       labels[0] = weekDays.map((date) {
@@ -278,7 +263,6 @@ class MyBarChartPageState extends State<MyBarChartPage> {
                 final dynamicLabels = data['labels'] as List<List<String>>;
                 final labels = _generateLabels(dynamicLabels);
 
-                // Debug
                 print('Labels tuần: ${labels[0]}');
                 print('Income tuần: ${incomeData[0]}');
                 print('Expense tuần: ${expenseData[0]}');

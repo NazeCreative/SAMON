@@ -108,8 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           BlocListener<WalletBloc, WalletState>(
-            listener: (context, state) {
-              // Wallet state changes will automatically trigger rebuild
+            listener: (context, state) {  
             },
           ),
         ],

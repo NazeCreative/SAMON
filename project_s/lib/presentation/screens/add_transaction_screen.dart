@@ -17,22 +17,18 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
-  // Controllers cho TextField
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
 
-  // State cho Dropdown
   String? _selectedWalletId;
   String? _selectedTransType;
   DateTime _selectedDate = DateTime.now();
 
-  // Các options mẫu
   final _transTypeOptions = ['Thu', 'Chi'];
 
   @override
   void initState() {
     super.initState();
-    // Tải dữ liệu ví
     context.read<WalletBloc>().add(const WalletsFetched());
   }
 
@@ -47,7 +43,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               backgroundColor: Colors.green,
             ),
           );
-          // Thông báo WalletBloc cập nhật (vì số dư ví đã thay đổi)
           context.read<WalletBloc>().add(const WalletsFetched());
           Navigator.pop(context);
         } else if (state is TransactionError) {
@@ -72,7 +67,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: ListView(
             children: [
-              // Tiêu đề (lưu vào note và làm category)
               _buildField(
                 child: TextField(
                   controller: _titleController,
@@ -84,7 +78,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Dropdown Ví
               BlocBuilder<WalletBloc, WalletState>(
                 builder: (context, state) {
                   if (state is WalletLoadSuccess) {
@@ -109,7 +102,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 },
               ),
               const SizedBox(height: 20),
-              // Dropdown Loại giao dịch
               _buildField(
                 child: DropdownButtonFormField<String>(
                   value: _selectedTransType,
@@ -122,7 +114,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Ngày
               _buildField(
                 child: Row(
                   children: [
@@ -172,7 +163,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Số tiền giao dịch
               _buildField(
                 child: TextField(
                   controller: _amountController,
@@ -185,7 +175,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              // Nút Thêm
               BlocBuilder<TransactionBloc, TransactionState>(
                 builder: (context, state) {
                   return SizedBox(
@@ -218,7 +207,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _addTransaction() {
-    // Validate form
     if (_titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Vui lòng nhập tiêu đề'), backgroundColor: Colors.red),
@@ -243,7 +231,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       );
       return;
     }
-    // Parse amount
     final amount = double.tryParse(_amountController.text);
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -251,7 +238,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       );
       return;
     }
-    // Get current user ID
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -259,21 +245,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       );
       return;
     }
-    // Create transaction: Lưu tiêu đề vào note, đồng thời dùng làm categoryId
     final transaction = TransactionModel(
-      id: '', // Sẽ được tạo bởi Firestore
+      id: '', 
       title: '',
       note: _titleController.text,
       amount: amount,
       type: _selectedTransType == 'Thu' ? TransactionType.income : TransactionType.expense,
-      categoryId: _titleController.text, // Dùng tiêu đề làm categoryId
+      categoryId: _titleController.text, 
       walletId: _selectedWalletId ?? '',
       userId: user.uid,
       date: _selectedDate,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    // Dispatch event
     context.read<TransactionBloc>().add(AddTransaction(transaction));
   }
 

@@ -17,18 +17,15 @@ class AuthRepository {
     required String displayName,
   }) async {
     try {
-      // Create user with email and password
       final UserCredential userCredential =
       await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // Get the user object
       final User? user = userCredential.user;
 
       if (user != null) {
-        // Create user document in Firestore
         await _firestore.collection('users').doc(user.uid).set({
           'displayName': displayName,
           'email': email,
@@ -109,22 +106,18 @@ class AuthRepository {
     }
   }
 
-  // Lấy người dùng hiện tại
   User? getCurrentUser() {
     return _firebaseAuth.currentUser;
   }
 
-  // Kiểm tra xem có người dùng đang đăng nhập không
   bool isUserLoggedIn() {
     return _firebaseAuth.currentUser != null;
   }
 
-  // Stream để lắng nghe thay đổi trạng thái đăng nhập
   Stream<User?> get authStateChanges {
     return _firebaseAuth.authStateChanges();
   }
 
-  // Method để tạo tài khoản test
   Future<void> createTestAccount() async {
     try {
       print('AuthRepository: Creating test account...');
@@ -138,7 +131,6 @@ class AuthRepository {
         print(
             'AuthRepository: Test account created successfully: ${userCredential.user!.uid}');
 
-        // Tạo user document trong Firestore
         await _firestore.collection('users').doc(userCredential.user!.uid).set({
           'displayName': 'Test User',
           'email': 'test@example.com',
@@ -153,7 +145,6 @@ class AuthRepository {
     }
   }
 
-  // Gửi email reset mật khẩu
   Future<void> sendPasswordResetEmail({required String email}) async {
     try {
       await _firebaseAuth.sendPasswordResetEmail(email: email);

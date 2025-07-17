@@ -12,10 +12,8 @@ class CategoryRepository {
   })  : _firestore = firestore,
         _firebaseAuth = firebaseAuth;
 
-  // Lấy danh sách tất cả danh mục (chỉ mặc định cho app)
   Future<List<CategoryModel>> getCategories() async {
     try {
-      // Lấy danh mục mặc định (isDefault = true)
       final QuerySnapshot defaultCategoriesSnapshot = await _firestore
           .collection('categories')
           .where('isDefault', isEqualTo: true)
@@ -26,7 +24,6 @@ class CategoryRepository {
           .map((doc) => CategoryModel.fromFirestore(doc))
           .toList();
 
-      // Thêm log để debug
       print('Số lượng danh mục lấy được: [${defaultCategories.length}]');
       for (var cat in defaultCategories) {
         print('Category: [${cat.name}] - id: [${cat.id}]');
@@ -40,7 +37,6 @@ class CategoryRepository {
     }
   }
 
-  // Lấy danh mục theo loại (thu/chi)
   Future<List<CategoryModel>> getCategoriesByType(String type) async {
     try {
       final User? currentUser = _firebaseAuth.currentUser;
@@ -48,7 +44,6 @@ class CategoryRepository {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Lấy danh mục mặc định theo loại
       final QuerySnapshot defaultCategoriesSnapshot = await _firestore
           .collection('categories')
           .where('isDefault', isEqualTo: true)
@@ -56,7 +51,6 @@ class CategoryRepository {
           .orderBy('name')
           .get();
 
-      // Lấy danh mục của người dùng theo loại
       final QuerySnapshot userCategoriesSnapshot = await _firestore
           .collection('categories')
           .where('userId', isEqualTo: currentUser.uid)
@@ -80,24 +74,20 @@ class CategoryRepository {
     }
   }
 
-  // Thêm danh mục mới
   Future<void> addCategory(CategoryModel category) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Tạo danh mục mới với userId của người dùng hiện tại
       final CategoryModel newCategory = category.copyWith(
         userId: currentUser.uid,
-        isDefault: false, // Danh mục do người dùng tạo không phải mặc định
+        isDefault: false, 
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      // Thêm vào Firestore
       await _firestore
           .collection('categories')
           .add(newCategory.toFirestore());
@@ -108,21 +98,17 @@ class CategoryRepository {
     }
   }
 
-  // Cập nhật danh mục
   Future<void> updateCategory(CategoryModel category) async {
     try {
-      // Kiểm tra xem danh mục có ID không
       if (category.id == null) {
         throw Exception('ID danh mục không hợp lệ');
       }
 
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Kiểm tra xem danh mục có thuộc về người dùng hiện tại không
       final DocumentSnapshot doc = await _firestore
           .collection('categories')
           .doc(category.id)
@@ -141,12 +127,10 @@ class CategoryRepository {
         throw Exception('Không có quyền cập nhật danh mục này');
       }
 
-      // Cập nhật danh mục với thời gian mới
       final CategoryModel updatedCategory = category.copyWith(
         updatedAt: DateTime.now(),
       );
 
-      // Cập nhật trong Firestore
       await _firestore
           .collection('categories')
           .doc(category.id)
@@ -162,16 +146,13 @@ class CategoryRepository {
     }
   }
 
-  // Xóa danh mục
   Future<void> deleteCategory(String categoryId) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Kiểm tra xem danh mục có thuộc về người dùng hiện tại không
       final DocumentSnapshot doc = await _firestore
           .collection('categories')
           .doc(categoryId)
@@ -190,7 +171,6 @@ class CategoryRepository {
         throw Exception('Không có quyền xóa danh mục này');
       }
 
-      // Xóa danh mục khỏi Firestore
       await _firestore
           .collection('categories')
           .doc(categoryId)
@@ -206,16 +186,13 @@ class CategoryRepository {
     }
   }
 
-  // Lấy danh mục theo ID
   Future<CategoryModel?> getCategoryById(String categoryId) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Lấy document từ Firestore
       final DocumentSnapshot doc = await _firestore
           .collection('categories')
           .doc(categoryId)
@@ -227,7 +204,6 @@ class CategoryRepository {
 
       final data = doc.data() as Map<String, dynamic>;
       
-      // Kiểm tra quyền truy cập (chỉ cho phép truy cập danh mục mặc định hoặc danh mục của người dùng)
       if (data['isDefault'] != true && data['userId'] != currentUser.uid) {
         throw Exception('Không có quyền truy cập danh mục này');
       }

@@ -1,4 +1,3 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -6,19 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 
-// Pages  
 import 'presentation/auth/welcome_page.dart';
 import 'presentation/auth/login_page.dart';
 import 'presentation/auth/signup_page.dart';
 import 'widgets/bot_nav_bar.dart';
 
-// Repositories
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/wallet_repository.dart';
 import 'data/repositories/category_repository.dart';
 import 'data/repositories/transaction_repository.dart';
 
-// BLoCs
 import 'blocs/auth/auth_bloc.dart';
 import 'blocs/wallet/wallet_bloc.dart';
 import 'blocs/transaction/transaction_bloc.dart';
@@ -31,9 +27,6 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  // Không cần setSettings cho email/password authentication
-  // setSettings chỉ áp dụng cho phone authentication
-
   runApp(const MyApp());
 }
 
@@ -44,7 +37,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
-        // Provide Firebase services
         RepositoryProvider<FirebaseAuth>(
           create: (context) => FirebaseAuth.instance,
         ),
@@ -52,7 +44,6 @@ class MyApp extends StatelessWidget {
           create: (context) => FirebaseFirestore.instance,
         ),
         
-        // Provide repositories
         RepositoryProvider<AuthRepository>(
           create: (context) => AuthRepository(
             firebaseAuth: context.read<FirebaseAuth>(),
@@ -81,7 +72,6 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers: [
-          // Provide BLoCs
           BlocProvider<AuthBloc>(
             create: (context) => AuthBloc(
               authRepository: context.read<AuthRepository>(),

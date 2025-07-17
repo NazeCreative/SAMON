@@ -12,23 +12,18 @@ class WalletRepository {
   })  : _firestore = firestore,
         _firebaseAuth = firebaseAuth;
 
-  // Lấy danh sách ví của người dùng hiện tại
   Future<List<WalletModel>> getWallets() async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Tạo query để lấy các ví của người dùng hiện tại
-      // Sử dụng orderBy đơn giản để tránh lỗi composite index
       final QuerySnapshot snapshot = await _firestore
           .collection('wallets')
           .where('userId', isEqualTo: currentUser.uid)
           .get();
 
-      // Chuyển đổi các document thành WalletModel
       final List<WalletModel> wallets = snapshot.docs
           .map((doc) => WalletModel.fromFirestore(doc))
           .toList();
@@ -41,23 +36,19 @@ class WalletRepository {
     }
   }
 
-  // Thêm ví mới
   Future<void> addWallet(WalletModel wallet) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Tạo ví mới với userId của người dùng hiện tại
       final WalletModel newWallet = wallet.copyWith(
         userId: currentUser.uid,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
 
-      // Thêm vào Firestore
       await _firestore
           .collection('wallets')
           .add(newWallet.toFirestore());
@@ -68,26 +59,21 @@ class WalletRepository {
     }
   }
 
-  // Cập nhật ví
   Future<void> updateWallet(WalletModel wallet) async {
     try {
-      // Kiểm tra xem ví có ID không
       if (wallet.id == null) {
         throw Exception('ID ví không hợp lệ');
       }
 
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Cập nhật ví với thời gian mới
       final WalletModel updatedWallet = wallet.copyWith(
         updatedAt: DateTime.now(),
       );
 
-      // Cập nhật trong Firestore
       await _firestore
           .collection('wallets')
           .doc(wallet.id)
@@ -103,16 +89,13 @@ class WalletRepository {
     }
   }
 
-  // Xóa ví
   Future<void> deleteWallet(String walletId) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Kiểm tra xem ví có thuộc về người dùng hiện tại không
       final DocumentSnapshot doc = await _firestore
           .collection('wallets')
           .doc(walletId)
@@ -127,7 +110,6 @@ class WalletRepository {
         throw Exception('Không có quyền xóa ví này');
       }
 
-      // Xóa ví khỏi Firestore
       await _firestore
           .collection('wallets')
           .doc(walletId)
@@ -143,16 +125,13 @@ class WalletRepository {
     }
   }
 
-  // Lấy ví theo ID
   Future<WalletModel?> getWalletById(String walletId) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Lấy document từ Firestore
       final DocumentSnapshot doc = await _firestore
           .collection('wallets')
           .doc(walletId)
@@ -162,7 +141,6 @@ class WalletRepository {
         return null;
       }
 
-      // Kiểm tra xem ví có thuộc về người dùng hiện tại không
       final data = doc.data() as Map<String, dynamic>;
       if (data['userId'] != currentUser.uid) {
         throw Exception('Không có quyền truy cập ví này');
@@ -176,16 +154,13 @@ class WalletRepository {
     }
   }
 
-  // Cập nhật số dư ví
   Future<void> updateWalletBalance(String walletId, double newBalance) async {
     try {
-      // Lấy User hiện tại từ FirebaseAuth
       final User? currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         throw Exception('Người dùng chưa đăng nhập');
       }
 
-      // Cập nhật số dư trong Firestore
       await _firestore
           .collection('wallets')
           .doc(walletId)

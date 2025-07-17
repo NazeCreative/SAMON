@@ -57,7 +57,6 @@ class _AccountScreenState extends State<AccountScreen> {
 
   Future<void> _uploadImage(File imageFile) async {
     try {
-      // Hiển thị loading
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -68,7 +67,6 @@ class _AccountScreenState extends State<AccountScreen> {
         },
       );
 
-      // Upload lên Cloudinary
       final downloadURL = await CloudinaryService.uploadImage(imageFile);
 
       if (downloadURL == null) {
@@ -79,7 +77,6 @@ class _AccountScreenState extends State<AccountScreen> {
         return;
       }
 
-      // Cập nhật URL trong Firestore
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await FirebaseFirestore.instance
@@ -88,12 +85,10 @@ class _AccountScreenState extends State<AccountScreen> {
             .update({'photoURL': downloadURL});
       }
 
-      // Cập nhật UI
       setState(() {
         photoURL = downloadURL;
       });
 
-      // Đóng loading
       Navigator.of(context).pop();
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -131,7 +126,6 @@ class _AccountScreenState extends State<AccountScreen> {
                   ? NetworkImage(photoURL!)
                   : AssetImage('assets/images/Samon_logo.png') as ImageProvider,
               onBackgroundImageError: (exception, stackTrace) {
-                // Fallback to default image if network image fails
                 setState(() {
                   photoURL = null;
                 });

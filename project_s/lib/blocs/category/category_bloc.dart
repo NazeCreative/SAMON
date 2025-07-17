@@ -57,7 +57,6 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     try {
       emit(const CategoryLoading());
       await _categoryRepository.addCategory(event.category);
-      // Tải lại danh sách sau khi thêm thành công
       final categories = await _categoryRepository.getCategories();
       emit(CategoryLoaded(categories));
     } catch (e) {
@@ -72,7 +71,6 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     try {
       emit(const CategoryLoading());
       await _categoryRepository.updateCategory(event.category);
-      // Tải lại danh sách sau khi cập nhật thành công
       final categories = await _categoryRepository.getCategories();
       emit(CategoryLoaded(categories));
     } catch (e) {
@@ -87,7 +85,6 @@ class CategoryBloc extends Bloc<CategoryEvent, CategoryState> {
     try {
       emit(const CategoryLoading());
       await _categoryRepository.deleteCategory(event.categoryId);
-      // Tải lại danh sách sau khi xóa thành công
       final categories = await _categoryRepository.getCategories();
       emit(CategoryLoaded(categories));
     } catch (e) {

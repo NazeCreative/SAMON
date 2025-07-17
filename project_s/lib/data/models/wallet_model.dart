@@ -19,7 +19,6 @@ class WalletModel {
     this.updatedAt,
   });
 
-  // Create WalletModel from Firestore document snapshot
   factory WalletModel.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     DateTime? parseTimestamp(dynamic value) {
@@ -39,7 +38,6 @@ class WalletModel {
     );
   }
 
-  // Convert WalletModel to Map for Firestore
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -51,7 +49,6 @@ class WalletModel {
     };
   }
 
-  // Create a copy of WalletModel with updated fields
   WalletModel copyWith({
     String? id,
     String? name,

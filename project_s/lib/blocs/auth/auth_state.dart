@@ -1,9 +1,8 @@
-// Abstract base class for all authentication states
+
 abstract class AuthState {
   const AuthState();
 }
 
-// Initial state when the app starts
 class AuthInitial extends AuthState {
   const AuthInitial();
 
@@ -11,7 +10,6 @@ class AuthInitial extends AuthState {
   String toString() => 'AuthInitial()';
 }
 
-// State when authentication is in progress (loading)
 class AuthLoadInProgress extends AuthState {
   const AuthLoadInProgress();
 
@@ -19,7 +17,6 @@ class AuthLoadInProgress extends AuthState {
   String toString() => 'AuthLoadInProgress()';
 }
 
-// State when authentication is successful
 class AuthSuccess extends AuthState {
   const AuthSuccess();
 
@@ -27,7 +24,6 @@ class AuthSuccess extends AuthState {
   String toString() => 'AuthSuccess()';
 }
 
-// State when password reset email is sent successfully
 class PasswordResetEmailSent extends AuthState {
   const PasswordResetEmailSent();
 
@@ -35,7 +31,6 @@ class PasswordResetEmailSent extends AuthState {
   String toString() => 'PasswordResetEmailSent()';
 }
 
-// State when user is already authenticated
 class AuthAuthenticated extends AuthState {
   final String userId;
   final String email;
@@ -49,7 +44,6 @@ class AuthAuthenticated extends AuthState {
   String toString() => 'AuthAuthenticated(userId: $userId, email: $email)';
 }
 
-// State when authentication fails
 class AuthFailure extends AuthState {
   final String error;
 
