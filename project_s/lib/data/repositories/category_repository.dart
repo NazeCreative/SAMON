@@ -83,7 +83,6 @@ class CategoryRepository {
 
       final CategoryModel newCategory = category.copyWith(
         userId: currentUser.uid,
-        isDefault: false, 
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );

@@ -6,7 +6,6 @@ class CategoryModel {
   final String type; 
   final String icon;
   final String color;
-  final bool isDefault;
   final String? userId;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -17,7 +16,6 @@ class CategoryModel {
     required this.type,
     required this.icon,
     required this.color,
-    this.isDefault = false,
     this.userId,
     required this.createdAt,
     required this.updatedAt,
@@ -31,7 +29,6 @@ class CategoryModel {
       type: data['type'] ?? 'expense', 
       icon: data['icon'] ?? '',
       color: data['color'] ?? '#000000',
-      isDefault: data['isDefault'] ?? false,
       userId: data['userId'],
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       updatedAt: (data['updatedAt'] as Timestamp).toDate(),
@@ -44,7 +41,6 @@ class CategoryModel {
       'type': type,
       'icon': icon,
       'color': color,
-      'isDefault': isDefault,
       'userId': userId,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
@@ -57,7 +53,6 @@ class CategoryModel {
     String? type,
     String? icon,
     String? color,
-    bool? isDefault,
     String? userId,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -68,7 +63,6 @@ class CategoryModel {
       type: type ?? this.type,
       icon: icon ?? this.icon,
       color: color ?? this.color,
-      isDefault: isDefault ?? this.isDefault,
       userId: userId ?? this.userId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -77,7 +71,7 @@ class CategoryModel {
 
   @override
   String toString() {
-    return 'CategoryModel(id: $id, name: $name, type: $type, icon: $icon, color: $color, isDefault: $isDefault, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'CategoryModel(id: $id, name: $name, type: $type, icon: $icon, color: $color, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -89,7 +83,6 @@ class CategoryModel {
         other.type == type &&
         other.icon == icon &&
         other.color == color &&
-        other.isDefault == isDefault &&
         other.userId == userId &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt;
@@ -102,7 +95,6 @@ class CategoryModel {
         type.hashCode ^
         icon.hashCode ^
         color.hashCode ^
-        isDefault.hashCode ^
         userId.hashCode ^
         createdAt.hashCode ^
         updatedAt.hashCode;
