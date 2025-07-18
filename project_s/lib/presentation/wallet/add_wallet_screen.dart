@@ -18,7 +18,7 @@ class AddWalletScreen extends StatefulWidget {
 class _AddWalletScreenState extends State<AddWalletScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController balanceController = TextEditingController();
-  String? _selectedIconAsset = 'assets/images/Samon_logo.png'; // Default asset
+  String? _selectedIconAsset = 'assets/images/Samon_logo.png';
   File? _selectedIconFile;
 
   // Danh sách icon có sẵn
