@@ -13,6 +13,8 @@ import '../../core/utils/formatter.dart';
 import '../../blocs/wallet/wallet_bloc.dart';
 import '../../blocs/wallet/wallet_state.dart';
 import '../../blocs/wallet/wallet_event.dart';
+import 'edit_transaction_screen.dart';
+import 'all_transactions_screen.dart';
 
 class MyBarChartPage extends StatefulWidget {
   const MyBarChartPage({super.key});
@@ -370,7 +372,12 @@ class MyBarChartPageState extends State<MyBarChartPage> {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff978fad)),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/transaction-detail');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const AllTransactionsScreen(),
+                                  ),
+                                );
                               },
                               child: Row(
                                 children: [
@@ -396,6 +403,22 @@ class MyBarChartPageState extends State<MyBarChartPage> {
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                           child: ListTile(
+                            onTap: () async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditTransactionScreen(transaction: transaction),
+                                ),
+                              );
+                              
+                              if (result != null && context.mounted) {
+                                if (result is TransactionModel) {
+                                  context.read<TransactionBloc>().add(UpdateTransaction(result));
+                                } else if (result is Map<String, dynamic> && result['action'] == 'delete') {
+                                  context.read<TransactionBloc>().add(DeleteTransaction(result['transactionId']));
+                                }
+                              }
+                            },
                             leading: CircleAvatar(
                               backgroundColor: getCategoryColor(transaction.categoryId),
                               child: Icon(getCategoryIcon(transaction.categoryId), color: Colors.white),
@@ -439,6 +462,7 @@ class MyBarChartPageState extends State<MyBarChartPage> {
                                 ),
                               ],
                             ),
+                            trailing: const Icon(Icons.chevron_right, color: Colors.white70),
                           ),
                         )),
                       const SizedBox(height: 100),

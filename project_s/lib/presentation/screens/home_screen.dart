@@ -15,6 +15,8 @@ import '../../blocs/wallet/wallet_bloc.dart';
 import '../../blocs/wallet/wallet_state.dart';
 import '../../blocs/wallet/wallet_event.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'edit_transaction_screen.dart';
+import 'all_transactions_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -280,7 +282,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 ),
                                 onPressed: () {
-                                  Navigator.pushNamed(context, '/transaction-detail');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const AllTransactionsScreen(),
+                                    ),
+                                  );
                                 },
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -315,6 +322,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                 margin: const EdgeInsets.symmetric(vertical: 8),
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                                 child: ListTile(
+                                  onTap: () async {
+                                    final result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditTransactionScreen(transaction: transaction),
+                                      ),
+                                    );
+                                    
+                                    if (result != null && context.mounted) {
+                                      if (result is TransactionModel) {
+                                        context.read<TransactionBloc>().add(UpdateTransaction(result));
+                                      } else if (result is Map<String, dynamic> && result['action'] == 'delete') {
+                                        context.read<TransactionBloc>().add(DeleteTransaction(result['transactionId']));
+                                      }
+                                    }
+                                  },
                                   leading: CircleAvatar(
                                     backgroundColor: color,
                                     child: Icon(icon, color: Colors.white),
@@ -359,6 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ],
                                   ),
+                                  trailing: const Icon(Icons.chevron_right, color: Colors.white70),
                                 ),
                               );
                             }).toList(),
