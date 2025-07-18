@@ -262,19 +262,7 @@ class MyBarChartPageState extends State<MyBarChartPage> {
                 final expenseData = data['expense'] as List<List<double>>;
                 final dynamicLabels = data['labels'] as List<List<String>>;
                 final labels = _generateLabels(dynamicLabels);
-
-                print('Labels tuần: ${labels[0]}');
-                print('Income tuần: ${incomeData[0]}');
-                print('Expense tuần: ${expenseData[0]}');
-                print('Labels tháng: ${labels[1]}');
-                print('Income tháng: ${incomeData[1]}');
-                print('Expense tháng: ${expenseData[1]}');
-                print('Labels quý: ${labels[2]}');
-                print('Income quý: ${incomeData[2]}');
-                print('Expense quý: ${expenseData[2]}');
-                print('Labels năm: ${labels[3]}');
-                print('Income năm: ${incomeData[3]}');
-                print('Expense năm: ${expenseData[3]}');
+                
 
                 final recentTransactions = List<TransactionModel>.from(transactions)
                   ..sort((a, b) => b.date.compareTo(a.date));
